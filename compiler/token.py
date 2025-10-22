@@ -10,4 +10,4 @@ class Token:
         return f"TokenType<{self.token_type}, {self.token_text}>"
 
     def __repr__(self):
-        return f"TokenType<{self.token_type}, {self.token_text}>"
+        return f"TokenType<{self.token_type.name}, {self.token_text}>"
