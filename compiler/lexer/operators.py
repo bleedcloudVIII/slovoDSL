@@ -1,5 +1,5 @@
 from enum import Enum
-from compiler.token_type import TokenType
+from compiler.lexer.token_type import TokenType
 
 
 class Operator(Enum):

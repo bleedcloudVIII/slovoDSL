@@ -1,4 +1,4 @@
-from compiler.token_type import TokenType
+from compiler.lexer.token_type import TokenType
 
 
 class Token:

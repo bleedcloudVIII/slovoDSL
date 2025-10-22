@@ -1,6 +1,6 @@
-from compiler.token_type import TokenType
-from compiler.token import Token
-from compiler.operators import OPERATORS_VALUE, get_token_type_by_text
+from compiler.lexer.token_type import TokenType
+from compiler.lexer.token import Token
+from compiler.lexer.operators import OPERATORS_VALUE, get_token_type_by_text
 
 
 class Lexer:
