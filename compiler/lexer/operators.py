@@ -13,6 +13,8 @@ class Operator(Enum):
     RIGHT_BRACKET = ("]", TokenType.RIGHT_BRACKET)
     LEFT_BRACE = ("{", TokenType.LEFT_BRACE)
     RIGHT_BRACE = ("}", TokenType.RIGHT_BRACE)
+    MULTIPLICATION = ("*", TokenType.MULTIPLICATION)
+    DIVISION = ("/", TokenType.DIVISION)
 
 
 def get_token_type_by_text(text: str):

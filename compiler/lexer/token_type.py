@@ -15,3 +15,5 @@ class TokenType(Enum):
     RIGHT_BRACKET = 9
     LEFT_BRACE = 10
     RIGHT_BRACE = 11
+    MULTIPLICATION = 12
+    DIVISION = 13
