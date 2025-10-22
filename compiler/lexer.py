@@ -1,6 +1,6 @@
 from compiler.token_type import TokenType
 from compiler.token import Token
-from compiler.operators import operators_value, get_token_type_by_text
+from compiler.operators import OPERATORS_VALUE, get_token_type_by_text
 
 
 class Lexer:
@@ -46,7 +46,7 @@ class Lexer:
 
     def tokenize_operator(self):
         str = ""
-        while (str + self.current_symbol) in operators_value:
+        while (str + self.current_symbol) in OPERATORS_VALUE:
             str += self.current_symbol
             self.position += 1
 
@@ -61,7 +61,7 @@ class Lexer:
                 self.tokenize_number()
             elif (self.current_symbol.isalpha()):
                 self.tokenize_word()
-            elif (self.current_symbol in operators_value):
+            elif (self.current_symbol in OPERATORS_VALUE):
                 self.tokenize_operator()
             else:
                 # spaces

@@ -19,6 +19,6 @@ def get_token_type_by_text(text: str):
     return next((operator.value[1] for operator in Operator if operator.value[0] == text), None)
 
 
-operators_value = [operator.value[0] for operator in Operator]
-operators_names = [operator.name for operator in Operator]
-operators_dict = [{operator.name: operator.value} for operator in Operator]
+OPERATORS_VALUE = [operator.value[0] for operator in Operator]
+OPERATORS_NAME = [operator.name for operator in Operator]
+OPERAATORS_DICT = [{operator.name: operator.value} for operator in Operator]
