@@ -2,6 +2,9 @@ from compiler.ast.nodes.node import Node
 from compiler.lexer.token import Token
 from compiler.lexer.token_type import TokenType
 
+# TODO Сделать хранение переменных нормальным
+VARIABLES = {}
+
 
 class AssignNode(Node):
     def __init__(self, variable: Token, expression: Node):
@@ -15,6 +18,8 @@ class AssignNode(Node):
         self.expression = expression
 
     def execute(self):
-        # TODO
         expression_value = self.expression.execute()
+
+        VARIABLES[self.variable] = expression_value
+
         return expression_value
