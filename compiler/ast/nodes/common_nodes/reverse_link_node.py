@@ -2,7 +2,7 @@ from compiler.ast.nodes.node import Node
 from compiler.ast.nodes.common_nodes.word_node import WordNode
 
 
-class LinkNode(Node):
+class ReverseLinkNode(Node):
     def __init__(self, left: Node, right: Node):
         if not isinstance(left, Node):
             raise Exception("LinkNode: left is not a Node")
@@ -14,7 +14,7 @@ class LinkNode(Node):
         self.right = right
 
     def execute(self):
-        left_value = self.left.execute()
+        right_value = self.right.execute()
 
-        if isinstance(self.right, WordNode):
-            self.right.set(left_value)
+        if isinstance(self.left, WordNode):
+            self.left.set(right_value)

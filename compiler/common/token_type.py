@@ -19,5 +19,6 @@ class TokenType(Enum):
     MULTIPLICATION = auto()
     DIVISION = auto()
     LINK = auto()
+    REVERSE_LINK = auto()
     LAYER_START = auto()
     LAYER_END = auto()

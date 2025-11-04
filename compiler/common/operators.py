@@ -16,6 +16,7 @@ class Operator(Enum):
     MULTIPLICATION = ("*", TokenType.MULTIPLICATION)
     DIVISION = ("/", TokenType.DIVISION)
     LINK = ("->", TokenType.LINK)
+    LINK = ("<-", TokenType.REVERSE_LINK)
     LAYER_START = ("[", TokenType.LAYER_START)
     LAYER_END = ("]", TokenType.LAYER_END)
 

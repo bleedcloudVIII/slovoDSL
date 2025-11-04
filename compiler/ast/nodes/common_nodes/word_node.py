@@ -15,10 +15,17 @@ class WordNode(Node):
     def is_key_word(self):
         return self.word.token_text not in KEY_WORDS_VALUE_NAME
 
+    def is_function(self):
+        return False
+
     def execute(self):
         if not self.is_key_word:
             return VARIABLES[self.word.token_text]
 
+        if not self.is_funciton():
+            pass
+
+        # По идеи сюда никак не попадёт
         raise Exception("WordNode: unrecognized word")
 
     def set(self, new_value):
