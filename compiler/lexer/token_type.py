@@ -1,19 +1,20 @@
-from enum import Enum
+from enum import Enum, auto
 
 
 class TokenType(Enum):
-    NUMBER = 0
-    STRING = 1
+    NUMBER = auto()
+    WORD = auto()
+    STRING = auto()
 
-    PLUS = 2
-    MINUS = 3
-    ASSIGN = 4
-    LEFT_PARENTHESES = 5
-    RIGHT_PARENTHESES = 6
-    COMMA = 7
-    LEFT_BRACKET = 8
-    RIGHT_BRACKET = 9
-    LEFT_BRACE = 10
-    RIGHT_BRACE = 11
-    MULTIPLICATION = 12
-    DIVISION = 13
+    PLUS = auto()
+    MINUS = auto()
+    ASSIGN = auto()
+    LEFT_PARENTHESES = auto()
+    RIGHT_PARENTHESES = auto()
+    COMMA = auto()
+    LEFT_BRACKET = auto()
+    RIGHT_BRACKET = auto()
+    LEFT_BRACE = auto()
+    RIGHT_BRACE = auto()
+    MULTIPLICATION = auto()
+    DIVISION = auto()

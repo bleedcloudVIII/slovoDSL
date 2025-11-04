@@ -34,7 +34,7 @@ class Lexer:
             if self.position >= self.length:
                 break
 
-        self.tokens.append(Token(TokenType.STRING, str))
+        self.tokens.append(Token(TokenType.WORD, str))
 
     def _get_operator_token(self, text: str):
         token_type = get_token_type_by_text(text)
