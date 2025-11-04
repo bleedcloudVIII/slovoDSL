@@ -1,0 +1,21 @@
+import "input_a.txt" -> a
+import "input_b.txt" -> b
+import "c.txt" -> space
+
+a -> [50, relu]
+b -> [60, sigmoid]
+c -> []
+
+Описание:
+Слой может не иметь кол-ва нейронов и функции активации - свободные члены 
+
+Есть:
+- Слои
+- Функции активации
+- Числа
+- Свободные члены (?) Отдельнеые от слоёв вектора
+
+TODO:
+- ImportNode
+- LayerOperator
+- LayerNode

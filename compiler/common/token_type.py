@@ -18,3 +18,6 @@ class TokenType(Enum):
     RIGHT_BRACE = auto()
     MULTIPLICATION = auto()
     DIVISION = auto()
+    LINK = auto()
+    LAYER_START = auto()
+    LAYER_END = auto()

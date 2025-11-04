@@ -15,6 +15,9 @@ class Operator(Enum):
     RIGHT_BRACE = ("}", TokenType.RIGHT_BRACE)
     MULTIPLICATION = ("*", TokenType.MULTIPLICATION)
     DIVISION = ("/", TokenType.DIVISION)
+    LINK = ("->", TokenType.LINK)
+    LAYER_START = ("[", TokenType.LAYER_START)
+    LAYER_END = ("]", TokenType.LAYER_END)
 
 
 def get_token_type_by_text(text: str):
