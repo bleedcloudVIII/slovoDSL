@@ -1,5 +1,5 @@
 from enum import Enum
-from compiler.lexer.token_type import TokenType
+from compiler.common.token_type import TokenType
 
 
 class Operator(Enum):
@@ -23,4 +23,4 @@ def get_token_type_by_text(text: str):
 
 OPERATORS_VALUE = [operator.value[0] for operator in Operator]
 OPERATORS_NAME = [operator.name for operator in Operator]
-OPERAATORS_DICT = [{operator.name: operator.value} for operator in Operator]
+OPERATORS_DICT = [{operator.name: operator.value} for operator in Operator]
