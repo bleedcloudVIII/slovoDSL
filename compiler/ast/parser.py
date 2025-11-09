@@ -2,6 +2,7 @@ from compiler.common.token import Token
 from compiler.common.token_type import TokenType
 from compiler.ast.nodes.common_nodes.assign_node import AssignNode
 from compiler.ast.nodes.common_nodes.bin_operator_node import BinOperatorTokenTypes, BinOperatorNode
+from compiler.ast.nodes.common_nodes.number_node import NumberNode
 from typing import List
 
 
@@ -75,6 +76,12 @@ class Parser():
 
         if right.token_type in BinOperatorTokenTypes:
             right = self.parse_bin_operator_node(position + 1)
+
+        if left.token_type == TokenType.NUMBER:
+            left = NumberNode(left)
+
+        if right.token_type == TokenType.NUMBER:
+            right = NumberNode(right)
 
         return (
             BinOperatorNode(
