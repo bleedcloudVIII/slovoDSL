@@ -10,17 +10,18 @@ class WordNode(Node):
         if word.token_type != TokenType.WORD:
             raise Exception("WordNode: Token type is wrong")
 
-        self.word = word
+        self.token = word
 
+    @property
     def is_key_word(self):
-        return self.word.token_text not in KEY_WORDS_VALUE_NAME
+        return self.token.token_text in KEY_WORDS_VALUE_NAME
 
     def is_function(self):
         return False
 
     def execute(self):
         if not self.is_key_word:
-            return VARIABLES[self.word.token_text]
+            return VARIABLES[self.token.token_text]
 
         if not self.is_funciton():
             pass
@@ -29,8 +30,14 @@ class WordNode(Node):
         raise Exception("WordNode: unrecognized word")
 
     def set(self, new_value):
-        VARIABLES[self.word.token_text] = new_value
+        VARIABLES[self.token.token_text] = new_value
         return None
 
     def get(self):
         return self.execute()
+
+    def __str__(self):
+        return f"WordNode<{self.token.token_text}>"
+
+    def __repr__(self):
+        return f"WordNode<{self.token.token_text}>"
