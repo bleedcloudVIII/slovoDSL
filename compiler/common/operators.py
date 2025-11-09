@@ -2,6 +2,10 @@ from enum import Enum
 from compiler.common.token_type import TokenType
 
 
+STRING_OPERATOR = "\""
+NEW_LINE_OPERATOR = "\n"
+
+
 class Operator(Enum):
     PLUS = ("+", TokenType.PLUS)
     MINUS = ("-", TokenType.MINUS)
@@ -19,7 +23,8 @@ class Operator(Enum):
     REVERSE_LINK = ("<-", TokenType.REVERSE_LINK)
     LAYER_START = ("[", TokenType.LAYER_START)
     LAYER_END = ("]", TokenType.LAYER_END)
-    STRING = ("\"", TokenType.STRING)
+    STRING = (STRING_OPERATOR, TokenType.STRING)
+    NEW_LINE = (NEW_LINE_OPERATOR, TokenType.NEW_LINE)
 
 
 def get_token_type_by_text(text: str):
@@ -30,4 +35,3 @@ OPERATORS_VALUE = [operator.value[0] for operator in Operator]
 OPERATORS_NAME = [operator.name for operator in Operator]
 OPERATORS_DICT = [{operator.name: operator.value} for operator in Operator]
 
-STRING_OPERATOR = "\""

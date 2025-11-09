@@ -21,3 +21,4 @@ class TokenType(Enum):
     REVERSE_LINK = auto()
     LAYER_START = auto()
     LAYER_END = auto()
+    NEW_LINE = auto()

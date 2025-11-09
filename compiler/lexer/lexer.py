@@ -1,6 +1,6 @@
 from compiler.common.token_type import TokenType
 from compiler.common.token import Token
-from compiler.common.operators import OPERATORS_VALUE, get_token_type_by_text, STRING_OPERATOR
+from compiler.common.operators import OPERATORS_VALUE, get_token_type_by_text, STRING_OPERATOR, NEW_LINE_OPERATOR
 
 
 class Lexer:
@@ -70,11 +70,14 @@ class Lexer:
 
         self.tokens.append(Token(TokenType.STRING, string))
 
+    def tokenize_new_line(self):
+        self.tokens.append(Token(TokenType.NEW_LINE, NEW_LINE_OPERATOR))
+        self.position += 1
+
     def lexer_analysis(self):
         while self.position < self.length:
-            print(self.current_symbol)
-            print(self.current_symbol == STRING_OPERATOR)
-            print("--------")
+            if self.current_symbol in OPERATORS_VALUE and self.current_symbol == NEW_LINE_OPERATOR:
+                self.tokenize_new_line()
             if self.current_symbol in OPERATORS_VALUE and self.current_symbol == STRING_OPERATOR:
                 self.tokenize_string()
             elif self.current_symbol in OPERATORS_VALUE:
