@@ -7,7 +7,14 @@ class NumberNode(Node):
     def __init__(self, value: Token):
         if value.token_type != TokenType.NUMBER:
             raise Exception("NumberNode: Token not a number")
-        self.value = value
+        self.token = value
 
     def execute(self):
-        return int(self.value.token_text)
+        return int(self.token.token_text)
+
+    def __str__(self):
+        return f"NumberNode<{self.token.token_text}>"
+
+    def __repr__(self):
+        return f"NumberNode<{self.token.token_text}>"
+
