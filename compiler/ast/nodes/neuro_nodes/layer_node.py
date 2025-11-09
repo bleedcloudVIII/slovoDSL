@@ -5,6 +5,7 @@ from typing import Optional
 
 
 class LayerNode(Node):
+    # TODO Свободные члены или типа того
     def __init__(self, neurons_count: Optional[NumberNode], function: Optional[WordNode]):
         if not isinstance(neurons_count, NumberNode):
             raise Exception("LayerNode: neurons_count is not a NumberNode")

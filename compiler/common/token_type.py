@@ -5,7 +5,6 @@ class TokenType(Enum):
     NUMBER = auto()
     WORD = auto()
     STRING = auto()
-
     PLUS = auto()
     MINUS = auto()
     ASSIGN = auto()
