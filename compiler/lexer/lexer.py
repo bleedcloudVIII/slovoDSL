@@ -1,6 +1,6 @@
 from compiler.common.token_type import TokenType
 from compiler.common.token import Token
-from compiler.common.operators import OPERATORS_VALUE, get_token_type_by_text, STRING_OPERATOR, NEW_LINE_OPERATOR
+from compiler.common.operators import OPERATORS, get_token_type_by_text, STRING_OPERATOR, NEW_LINE_OPERATOR
 
 
 class Lexer:
@@ -46,7 +46,7 @@ class Lexer:
 
     def tokenize_operator(self):
         string = ""
-        while (string + self.current_symbol) in OPERATORS_VALUE:
+        while (string + self.current_symbol) in OPERATORS:
             string += self.current_symbol
             self.position += 1
 
@@ -76,11 +76,11 @@ class Lexer:
 
     def lexer_analysis(self):
         while self.position < self.length:
-            if self.current_symbol in OPERATORS_VALUE and self.current_symbol == NEW_LINE_OPERATOR:
+            if self.current_symbol in OPERATORS and self.current_symbol == NEW_LINE_OPERATOR:
                 self.tokenize_new_line()
-            if self.current_symbol in OPERATORS_VALUE and self.current_symbol == STRING_OPERATOR:
+            if self.current_symbol in OPERATORS and self.current_symbol == STRING_OPERATOR:
                 self.tokenize_string()
-            elif self.current_symbol in OPERATORS_VALUE:
+            elif self.current_symbol in OPERATORS:
                 self.tokenize_operator()
             elif self.current_symbol.isdigit():
                 self.tokenize_number()

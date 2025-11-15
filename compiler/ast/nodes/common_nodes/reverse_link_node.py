@@ -18,3 +18,9 @@ class ReverseLinkNode(Node):
 
         if isinstance(self.left, WordNode):
             self.left.set(right_value)
+
+    def __str__(self):
+        return f"ReverseLinkNode<{self.left}, {self.right}>"
+
+    def __repr__(self):
+        return f"ReverseLinkNode<{self.left}, {self.right}>"

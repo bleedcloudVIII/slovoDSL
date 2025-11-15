@@ -3,7 +3,7 @@ from compiler.common.token import Token
 from compiler.common.token_type import TokenType
 
 
-BinOperatorTokenTypes = [
+BIN_OPERATOR_TOKEN_TYPES = [
     TokenType.PLUS,
     TokenType.MINUS,
     TokenType.MULTIPLICATION,
@@ -67,7 +67,6 @@ class BinOperatorNode(Node):
         raise Exception(f"BinOperatorNode: operator {self.operator.token_type.name} is not supported")
 
     def __str__(self):
-        # FIXME AttributeError: 'TokenType' object has no attribute 'token_type' - {self.operator.token_type.name}
         return f"BinOperatorNode<{self.operator.token_type.name}, {self.left_value}, {self.right_value}>"
 
     def __repr__(self):

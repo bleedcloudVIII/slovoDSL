@@ -34,3 +34,4 @@ def get_token_type_by_text(text: str):
 OPERATORS_VALUE = [operator.value[0] for operator in Operator]
 OPERATORS_NAME = [operator.name for operator in Operator]
 OPERATORS_DICT = [{operator.name: operator.value} for operator in Operator]
+OPERATORS = [operator.value[0] for operator in Operator] + ["<"]
