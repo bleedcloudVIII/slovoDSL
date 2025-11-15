@@ -71,7 +71,7 @@ class Lexer:
         self.tokens.append(Token(TokenType.STRING, string))
 
     def tokenize_new_line(self):
-        self.tokens.append(Token(TokenType.NEW_LINE, NEW_LINE_OPERATOR))
+        self.tokens.append(Token(TokenType.NEW_LINE_SEPARATOR, NEW_LINE_OPERATOR))
         self.position += 1
 
     def lexer_analysis(self):

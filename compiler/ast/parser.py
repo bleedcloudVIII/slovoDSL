@@ -10,9 +10,27 @@ class Parser():
     def __init__(self, tokens: List[Token]):
         self.tokens = tokens
         self.line_position = 0
-        self.position = 0
         self.nodes = []
-        self.length = len(self.tokens)
+
+        self._separate_lines()
+
+    def _separate_lines(self):
+        result = []
+        current = []
+
+        for t in self.tokens:
+            if t.token_type == TokenType.NEW_LINE_SEPARATOR:
+                if current:
+                    result.append(current)
+                    current = []
+            else:
+                current.append(t)
+
+        if current:
+            result.append(current)
+
+        self.code_lines = result
+        self.code_line_count = len(result)
 
     @property
     def current_token(self):
@@ -92,7 +110,15 @@ class Parser():
             2
         )
 
-    def parse(self):
+    def _parse_line(self, line_position: int = None):
+        if line_position is None:
+            line_position = self.line_position
+
+        self.tokens = self.code_lines[line_position]
+
+        self.position = 0
+        self.length = len(self.tokens)
+
         while self.position < self.length:
             if self.current_token_type == TokenType.ASSIGN:
                 node, delta = self.parse_assign_node()
@@ -107,5 +133,11 @@ class Parser():
                 self.position += delta
             # else:
             #     self.position += 1
+
+        # return self.nodes
+
+    def parse(self):
+        for i in range(self.code_line_count):
+            self._parse_line(i)
 
         return self.nodes

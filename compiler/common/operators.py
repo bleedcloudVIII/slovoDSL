@@ -24,7 +24,7 @@ class Operator(Enum):
     LAYER_START = ("[", TokenType.LAYER_START)
     LAYER_END = ("]", TokenType.LAYER_END)
     STRING = (STRING_OPERATOR, TokenType.STRING)
-    NEW_LINE = (NEW_LINE_OPERATOR, TokenType.NEW_LINE)
+    NEW_LINE_SEPARATOR = (NEW_LINE_OPERATOR, TokenType.NEW_LINE_SEPARATOR)
 
 
 def get_token_type_by_text(text: str):
@@ -34,4 +34,3 @@ def get_token_type_by_text(text: str):
 OPERATORS_VALUE = [operator.value[0] for operator in Operator]
 OPERATORS_NAME = [operator.name for operator in Operator]
 OPERATORS_DICT = [{operator.name: operator.value} for operator in Operator]
-
