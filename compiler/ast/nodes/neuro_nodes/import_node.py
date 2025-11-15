@@ -4,6 +4,7 @@ from compiler.common.token_type import TokenType
 
 
 class ImportNode(Node):
+    # Что это вообще???
     def __init__(self, token: Token):
         if token.token_type != TokenType.WORD:
             raise Exception("ImportNode: token is not Word")
