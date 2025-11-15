@@ -7,10 +7,10 @@ from typing import Optional
 class LayerNode(Node):
     # TODO Свободные члены или типа того
     def __init__(self, neurons_count: Optional[NumberNode], function: Optional[WordNode]):
-        if not isinstance(neurons_count, NumberNode):
+        if neurons_count and not isinstance(neurons_count, NumberNode):
             raise Exception("LayerNode: neurons_count is not a NumberNode")
 
-        if not isinstance(function, WordNode):
+        if function and not isinstance(function, WordNode):
             raise Exception("LayerNode: functino is not a WordNode")
 
         self.neurons_count = neurons_count
@@ -19,3 +19,9 @@ class LayerNode(Node):
     def execute(self):
         # TODO Что-то делать
         return None
+
+    def __str__(self):
+        return f"LayerNode<{self.neurons_count.token.token_text if self.neurons_count else None}, {self.function.word.token_text if self.function else None }>"
+
+    def __repr__(self):
+        return f"ReverseLinkNode<{self.left}, {self.right}>"

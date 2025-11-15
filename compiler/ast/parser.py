@@ -7,6 +7,7 @@ from compiler.ast.nodes.common_nodes.number_node import NumberNode
 from compiler.ast.nodes.common_nodes.link_node import LinkNode
 from compiler.ast.nodes.common_nodes.reverse_link_node import ReverseLinkNode
 from compiler.ast.nodes.common_nodes.path_node import PathNode
+from compiler.ast.nodes.neuro_nodes.layer_node import LayerNode
 from typing import List
 
 
@@ -37,12 +38,16 @@ class Parser():
         self.code_line_count = len(result)
 
     @property
-    def current_token(self):
+    def current_token(self) -> Token:
         return self.tokens[self.position]
 
     @property
-    def current_token_type(self):
+    def current_token_type(self) -> TokenType:
         return self.tokens[self.position].token_type
+
+    @property
+    def current_line_tokens(self) -> List[Token]:
+        return self.code_lines[self.line_position]
 
     def token(self, position: int):
         return self.tokens[position]
@@ -175,6 +180,55 @@ class Parser():
         else:
             raise Exception("Parser: Unknown operator_type in _parse_link_operator_node")
 
+    def parse_layer_node(self, position: int = None):
+        if position is None:
+            position = self.position
+
+        if position + 1 > self.length:
+            raise Exception("Parser: doesn't have all values for LayerNode")
+
+        if TokenType.LAYER_END not in [t.token_type for t in self.current_line_tokens]:
+            raise Exception(f"Parser: layer doesn't closed at line {self.line_position + 1}")
+
+        neurones_count = self.token(position + 1)
+
+        if neurones_count.token_type == TokenType.LAYER_END:
+            return (
+                LayerNode(
+                    neurons_count=None,
+                    function=None
+                ),
+                2
+            )
+        # TODO обработка запятой
+        if len(self.tokens) < 3:
+            return (
+                LayerNode(
+                    neurons_count=NumberNode(neurones_count),
+                    function=None
+                ),
+                4
+            )
+
+        func = self.token(position + 3)
+
+        if func.token_type == TokenType.LAYER_END:
+            return (
+                LayerNode(
+                    neurons_count=NumberNode(neurones_count),
+                    function=None
+                ),
+                4
+            )
+
+        return (
+            LayerNode(
+                neurons_count=NumberNode(neurones_count),
+                function=self.parse_word_node(token=func)
+            ),
+            5
+        )
+
     def _parse_line(self, line_position: int = None):
         if line_position is None:
             line_position = self.line_position
@@ -201,6 +255,10 @@ class Parser():
                 node, delta = self.parse_link_operator_node()
                 self.nodes.append(node)
                 self.position += delta
+            elif self.current_token.token_type == TokenType.LAYER_START:
+                node, delta = self.parse_layer_node()
+                self.nodes.append(node)
+                self.position += delta
             else:
                 self.position += 1
 
@@ -208,6 +266,8 @@ class Parser():
 
     def parse(self):
         for i in range(self.code_line_count):
+            self.line_position = i
+            self.current_line_tokens
             self._parse_line(i)
 
         return self.nodes
