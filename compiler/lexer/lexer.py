@@ -12,7 +12,9 @@ class Lexer:
 
     @property
     def current_symbol(self):
-        return self.code[self.position]
+        if self.position < self.length:
+            return self.code[self.position]
+        return ''
 
     def tokenize_number(self):
         string = ""

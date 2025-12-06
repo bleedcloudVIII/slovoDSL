@@ -21,7 +21,11 @@ class LayerNode(Node):
         return None
 
     def __str__(self):
-        return f"LayerNode<{self.neurons_count.token.token_text if self.neurons_count else None}, {self.function.word.token_text if self.function else None }>"
+        neurons_count = self.neurons_count.token.token_text if self.neurons_count else None
+        func = self.function.token.token_text if self.function else None
+        return f"LayerNode<{neurons_count}, {func}>"
 
     def __repr__(self):
-        return f"ReverseLinkNode<{self.left}, {self.right}>"
+        neurons_count = self.neurons_count.token.token_text if self.neurons_count else None
+        func = self.function.token.token_text if self.function else None
+        return f"LayerNode<{neurons_count}, {func}>"

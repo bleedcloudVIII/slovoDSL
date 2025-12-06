@@ -201,7 +201,7 @@ class Parser():
                 2
             )
         # TODO обработка запятой
-        if len(self.tokens) < 3:
+        if len(self.tokens) <= 3:
             return (
                 LayerNode(
                     neurons_count=NumberNode(neurones_count),
