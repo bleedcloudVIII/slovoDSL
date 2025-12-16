@@ -9,6 +9,7 @@ from compiler.ast.nodes.common_nodes.reverse_link_node import ReverseLinkNode
 from compiler.ast.nodes.common_nodes.path_node import PathNode
 from compiler.ast.nodes.neuro_nodes.layer_node import LayerNode
 from typing import List
+from itertools import takewhile
 
 
 class Parser():
@@ -87,6 +88,17 @@ class Parser():
             ),
             delta + 2
         )
+
+    def parse_number_node(self, position: int = None):        
+        if position is None:
+            position = self.position
+
+        token = self.current_token
+
+        if token.token_type == TokenType.NUMBER:
+            return NumberNode(token)
+
+        raise ValueError("Parser: cannot parse NumberNode")
 
     def parse_bin_operator_node(self, position: int = None):
         if position is None:
@@ -200,8 +212,16 @@ class Parser():
                 ),
                 2
             )
-        # TODO обработка запятой
-        if len(self.tokens) <= 3:
+
+        # Берём все токены после LAYER_START и до COMMA и парсим
+        neurons_tokens = list(takewhile(
+            lambda token: token.token_type != TokenType.COMMA and token.token_type != TokenType.LAYER_END,
+            self.current_line_tokens[1:]
+        ))
+
+        neurons_number = self._parse_tokens(neurons_tokens)
+
+        if len(self.tokens) <= 1 + 1 + len(neurons_tokens):
             return (
                 LayerNode(
                     neurons_count=NumberNode(neurones_count),
@@ -229,45 +249,47 @@ class Parser():
             5
         )
 
-    def _parse_line(self, line_position: int = None):
-        if line_position is None:
-            line_position = self.line_position
-
-        self.tokens = self.code_lines[line_position]
+    def _parse_tokens(self, tokens: List[Token] = None):
+        self.tokens = tokens
 
         self.position = 0
         self.length = len(self.tokens)
 
+        nodes = []
         while self.position < self.length:
             if self.current_token_type == TokenType.ASSIGN:
                 node, delta = self.parse_assign_node()
-                self.nodes.append(node)
+                nodes.append(node)
                 self.position += delta
+            elif self.current_token_type == TokenType.NUMBER:
+                node = self.parse_number_node()
+                nodes.append(node)
             elif self.current_token_type == TokenType.WORD:
                 # TODO Смотреть следующий токен, если бинарный или линк пропускать, иначе ошибка?
                 # self.nodes.append(self.parse_word_node())
                 self.position += 1
             elif self.current_token_type in BIN_OPERATOR_TOKEN_TYPES:
                 node, delta = self.parse_bin_operator_node()
-                self.nodes.append(node)
+                nodes.append(node)
                 self.position += delta
             elif self.current_token_type in LINKS_OPERATORS_TOKEN_TYPE:
                 node, delta = self.parse_link_operator_node()
-                self.nodes.append(node)
+                nodes.append(node)
                 self.position += delta
             elif self.current_token.token_type == TokenType.LAYER_START:
                 node, delta = self.parse_layer_node()
-                self.nodes.append(node)
+                nodes.append(node)
                 self.position += delta
             else:
                 self.position += 1
 
-        # return self.nodes
+        return nodes
 
     def parse(self):
         for i in range(self.code_line_count):
             self.line_position = i
-            self.current_line_tokens
-            self._parse_line(i)
+            tokens = self.current_line_tokens
+            nodes = self._parse_tokens(tokens)
+            self.nodes.extend(nodes)
 
         return self.nodes

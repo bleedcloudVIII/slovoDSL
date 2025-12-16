@@ -35,9 +35,11 @@ print(c.execute())
 # []
 # [50]
 # [60, sigmoid]"""
-code = """[]
-[50]
-[60, sigmoid]"""
+code = """
+[]
+[60 *2]
+[60 * 30, sigmoid]
+"""
 lexer = Lexer(code)
 
 tokens = lexer.lexer_analysis()
