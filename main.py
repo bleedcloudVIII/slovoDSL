@@ -37,8 +37,13 @@ print(c.execute())
 # [60, sigmoid]"""
 code = """
 []
-[60 *2]
-[60 * 30, sigmoid]
+[30]
+[50, log]
+[12+123, max]
+a -> []
+b -> [60 * 2]
+c -> [60, sigmoid]
+c -> a
 """
 lexer = Lexer(code)
 
@@ -48,5 +53,8 @@ print(tokens)
 parser = Parser(tokens)
 nodes = parser.parse()
 
-print(nodes)
-print(nodes[0].execute())
+for n in nodes:
+    print(n)
+
+# print(nodes)
+# print(nodes[0].execute())

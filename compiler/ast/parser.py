@@ -8,6 +8,7 @@ from compiler.ast.nodes.common_nodes.link_node import LinkNode
 from compiler.ast.nodes.common_nodes.reverse_link_node import ReverseLinkNode
 from compiler.ast.nodes.common_nodes.path_node import PathNode
 from compiler.ast.nodes.neuro_nodes.layer_node import LayerNode
+from compiler.ast.nodes.node import Node
 from typing import List
 from itertools import takewhile
 
@@ -144,14 +145,19 @@ class Parser():
 
         if right.token_type == TokenType.WORD:
             right = self.parse_word_node(token=right)
+
         # TODO дописать, когда появится новая логика
+        delta_pos = 0
+        if not isinstance(right, Node) and right.token_type == TokenType.LAYER_START:
+            # FIXME position
+            right, delta_pos = self.parse_layer_node(2)
 
         return (
             LinkNode(
                 left=left,
                 right=right
             ),
-            2
+            2 + delta_pos
         )
 
     def _parse_reverse_link(self, left: Token, right: Token):
@@ -216,21 +222,36 @@ class Parser():
         # Берём все токены после LAYER_START и до COMMA и парсим
         neurons_tokens = list(takewhile(
             lambda token: token.token_type != TokenType.COMMA and token.token_type != TokenType.LAYER_END,
-            self.current_line_tokens[1:]
+            self.current_line_tokens[position + 1:]
         ))
 
-        neurons_number = self._parse_tokens(neurons_tokens)
+        layer_tokens = list(takewhile(
+            lambda token: token.token_type != TokenType.LAYER_END,
+            self.current_line_tokens[position + 1:]
+        ))
 
-        if len(self.tokens) <= 1 + 1 + len(neurons_tokens):
+        comma_count = 0
+        for token in layer_tokens:
+            if token.token_type == TokenType.COMMA:
+                comma_count += 1
+
+        # FIXME
+        neurones_count = self._parse_tokens(neurons_tokens)
+        if len(neurones_count) > 1:
+            neurones_count = neurones_count[1]
+        else:
+            neurones_count = neurones_count[0]
+
+        if comma_count < 1:
             return (
                 LayerNode(
-                    neurons_count=NumberNode(neurones_count),
+                    neurons_count=neurones_count,
                     function=None
                 ),
                 4
             )
 
-        func = self.token(position + 3)
+        func = layer_tokens[-1]
 
         if func.token_type == TokenType.LAYER_END:
             return (
@@ -243,7 +264,7 @@ class Parser():
 
         return (
             LayerNode(
-                neurons_count=NumberNode(neurones_count),
+                neurons_count=neurones_count,
                 function=self.parse_word_node(token=func)
             ),
             5
@@ -264,6 +285,7 @@ class Parser():
             elif self.current_token_type == TokenType.NUMBER:
                 node = self.parse_number_node()
                 nodes.append(node)
+                self.position += 1
             elif self.current_token_type == TokenType.WORD:
                 # TODO Смотреть следующий токен, если бинарный или линк пропускать, иначе ошибка?
                 # self.nodes.append(self.parse_word_node())
