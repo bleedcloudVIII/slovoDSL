@@ -4,7 +4,7 @@ from compiler.ast.nodes.common_nodes.bin_operator_node import BIN_OPERATOR_TOKEN
 from compiler.ast.nodes.common_nodes.number_node import NumberNode
 from compiler.ast.nodes.common_nodes.link_node import LinkNode
 from compiler.ast.nodes.common_nodes.reverse_link_node import ReverseLinkNode
-# from compiler.ast.nodes.common_nodes.path_node import PathNode
+from compiler.ast.nodes.common_nodes.path_node import PathNode
 from compiler.ast.nodes.neuro_nodes.layer_node import LayerNode
 from typing import List
 from itertools import takewhile
@@ -199,6 +199,9 @@ class Parser():
             1 + neurons_delta + 3
         )
 
+    def parse_path(self, token: Token):
+        return PathNode(path=token.token_text)
+
     def _parse_tokens(self, tokens: List[Token] = None, position: int = None):
         position = 0 if position is None else position
         length = len(tokens)
@@ -238,6 +241,10 @@ class Parser():
                 node, delta = self.parse_layer_node(layer_tokens)
                 nodes.append(node)
                 position += delta
+            elif current_token_type == TokenType.STRING:
+                node = self.parse_path(tokens[position])
+                nodes.append(node)
+                position += 1
             else:
                 position += 1
 

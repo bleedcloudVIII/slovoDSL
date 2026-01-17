@@ -35,12 +35,12 @@ print(c.execute())
 
 # code = """[60+ 10, ii]"""
 
-code = """
-[]
-[50 / 2]
-[,func]
-[60 + 10 * 2, sigmoid]
-"""
+# code = """
+# []
+# [50 / 2]
+# [,func]
+# [60 + 10 * 2, sigmoid]
+# """
 
 # code = """60 + 90 - 20 + 1"""
 # 129
@@ -49,9 +49,9 @@ code = """
 # code = """ a -> 70 + 20 """
 # code = """ 30 + 10 -> t """
 
-# 60 + 90 - 20 + 1
-# 60 + 90 - 20 + 1
 # code = """60 + 90 - 20"""
+
+code = """ "path/to/file.txt" """
 lexer = Lexer(code)
 
 tokens = lexer.lexer_analysis()
