@@ -1,6 +1,6 @@
 from compiler.ast.nodes.node import Node
-from compiler.common.token import Token
-from compiler.common.token_type import TokenType
+# from compiler.common.token import Token
+# from compiler.common.token_type import TokenType
 
 # TODO Сделать хранение переменных нормальным
 VARIABLES = {}

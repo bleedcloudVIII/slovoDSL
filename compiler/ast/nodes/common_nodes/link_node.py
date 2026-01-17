@@ -11,12 +11,6 @@ LINKS_OPERATORS_TOKEN_TYPE = [
 
 class LinkNode(Node):
     def __init__(self, left: Node, right: Node):
-        # if not isinstance(left, Node):
-        #     raise Exception("LinkNode: left is not a Node")
-
-        # if not isinstance(right, Node):
-        #     raise Exception("LinkNode: right is not a Node")
-
         self.left = left
         self.right = right
 

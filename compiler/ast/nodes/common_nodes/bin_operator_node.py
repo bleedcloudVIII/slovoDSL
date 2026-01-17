@@ -17,21 +17,6 @@ class BinOperatorNode(Node):
         self.left_value = left_value
         self.right_value = right_value
 
-    # def _get_int(self, value):
-    #     return value.execute()
-
-    # def _get_int_values(self):
-        # left_number = self._get_int(self.left_value)
-        # right_number = self._get_int(self.right_value)
-
-        # return left_number, right_number
-
-    def _get_values(self):
-        left = self.left_value.execute()
-        right = self.right_value.execute()
-
-        return left, right
-
     def _execute_plus(self):
         left, right = self._get_values()
 
@@ -41,6 +26,12 @@ class BinOperatorNode(Node):
         left, right = self._get_values()
 
         return left - right
+
+    def _get_values(self):
+        left = self.left_value.execute()
+        right = self.right_value.execute()
+
+        return left, right
 
     def _execute_miltiplication(self):
         left, right = self._get_values()

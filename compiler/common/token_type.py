@@ -7,7 +7,7 @@ class TokenType(Enum):
     STRING = auto()
     PLUS = auto()
     MINUS = auto()
-    ASSIGN = auto()
+    # ASSIGN = auto()
     LEFT_PARENTHESES = auto()
     RIGHT_PARENTHESES = auto()
     COMMA = auto()

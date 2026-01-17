@@ -9,12 +9,10 @@ NEW_LINE_OPERATOR = "\n"
 class Operator(Enum):
     PLUS = ("+", TokenType.PLUS)
     MINUS = ("-", TokenType.MINUS)
-    ASSIGN = ("=", TokenType.ASSIGN)
+    # ASSIGN = ("=", TokenType.ASSIGN)
     LEFT_PARENTHESES = ("(", TokenType.LEFT_PARENTHESES)
     RIGHT_PARENTHESES = (")", TokenType.RIGHT_PARENTHESES)
     COMMA = (",", TokenType.COMMA)
-    # LEFT_BRACKET = ("[", TokenType.LEFT_BRACKET)
-    # RIGHT_BRACKET = ("]", TokenType.RIGHT_BRACKET)
     LEFT_BRACE = ("{", TokenType.LEFT_BRACE)
     RIGHT_BRACE = ("}", TokenType.RIGHT_BRACE)
     MULTIPLICATION = ("*", TokenType.MULTIPLICATION)

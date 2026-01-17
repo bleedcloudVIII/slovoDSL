@@ -89,7 +89,6 @@ class Lexer:
             elif self.current_symbol.isalpha():
                 self.tokenize_word()
             else:
-                # spaces
                 self.position += 1
 
         return self.tokens

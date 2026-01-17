@@ -5,12 +5,7 @@ from typing import Optional
 
 
 class LayerNode(Node):
-    # TODO Свободные члены или типа того
-    # TODO Те только Числа, но и у другие Ноды (наверное в будущем, но стоит продумать)
     def __init__(self, neurons_count: Optional[NumberNode], function: Optional[WordNode]):
-        # if neurons_count and not isinstance(neurons_count, NumberNode):
-        #     raise Exception("LayerNode: neurons_count is not a NumberNode")
-
         if function and not isinstance(function, WordNode):
             raise Exception("LayerNode: functino is not a WordNode")
 
@@ -22,11 +17,11 @@ class LayerNode(Node):
         return None
 
     def __str__(self):
-        neurons_count = self.neurons_count.execute() if self.neurons_count else None
+        neurons_count = self.neurons_count if self.neurons_count else None
         func = self.function.token.token_text if self.function else None
         return f"LayerNode<{neurons_count}, {func}>"
 
     def __repr__(self):
-        neurons_count = self.neurons_count.execute() if self.neurons_count else None
+        neurons_count = self.neurons_count if self.neurons_count else None
         func = self.function.token.token_text if self.function else None
         return f"LayerNode<{neurons_count}, {func}>"

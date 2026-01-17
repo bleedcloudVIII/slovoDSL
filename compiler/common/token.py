@@ -7,7 +7,11 @@ class Token:
         self.token_text = token_text
 
     def __str__(self):
+        if self.token_type == TokenType.NEW_LINE_SEPARATOR:
+            return f"Token<{self.token_type}>"
         return f"Token<{self.token_type}, {self.token_text}>"
 
     def __repr__(self):
-        return f"Token<{self.token_type.name}, {self.token_text}>"
+        if self.token_type == TokenType.NEW_LINE_SEPARATOR:
+            return f"\nToken<{self.token_type}>\n"
+        return f"\nToken<{self.token_type.name}, {self.token_text}>"

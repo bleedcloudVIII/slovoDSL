@@ -17,4 +17,3 @@ class NumberNode(Node):
 
     def __repr__(self):
         return f"NumberNode<{self.token.token_text}>"
-
