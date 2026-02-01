@@ -13,5 +13,5 @@ class Token:
 
     def __repr__(self):
         if self.token_type == TokenType.NEW_LINE_SEPARATOR:
-            return f"\nToken<{self.token_type}>\n"
-        return f"\nToken<{self.token_type.name}, {self.token_text}>"
+            return f"Token<{self.token_type}>\n"
+        return f"Token<{self.token_type.name}, {self.token_text}>"

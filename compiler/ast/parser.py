@@ -9,6 +9,7 @@ from compiler.ast.nodes.neuro_nodes.layer_node import LayerNode
 from typing import List
 from itertools import takewhile
 from compiler.ast.nodes.common_nodes.word_node import WordNode
+from compiler.ast.nodes.node import Node
 
 
 class Parser():
@@ -54,13 +55,14 @@ class Parser():
         if token.token_type == TokenType.NUMBER:
             return NumberNode(token)
 
-    def parse_bin_operator_node(self, tokens: list[Token], position: int = None):
+    def parse_bin_operator_node(self, left: Node, operator: Token, right: Node):
+        return BinOperatorNode(operator, left, right)
+
+    def parse_bin_operator_expression(self, tokens: list[Token]):
         """
         tokens = [left_token, operator, right_tokens[]]
         """
-        operator = tokens[1]
-        left_tokens = tokens[:1]
-        right_tokens = list(takewhile(
+        expression_tokens = list(takewhile(
             lambda token:
                 token.token_type != TokenType.COMMA and
                 token.token_type != TokenType.LAYER_END and
@@ -75,22 +77,119 @@ class Parser():
                 token.token_type != TokenType.RIGHT_BRACE and
                 token.token_type != TokenType.RIGHT_BRACKET and
                 token.token_type != TokenType.RIGHT_PARENTHESES,
-            tokens[2:]
+            tokens
         ))
 
-        left, left_position = self._parse_tokens(left_tokens)
-        right, right_position = self._parse_tokens(right_tokens)
+        # Ноды и токены
+        token_types = [
+            token.token_type
+            if isinstance(token.token_type, Token)
+            else token
+            for token in expression_tokens
+        ]
 
-        left = left[-1]
-        right = right[-1]
+        token_index = 0
+        delta = 0
+        while token_index < len(token_types):
+            token = token_types[token_index]
+            if not isinstance(token, Token):
+                token_index += 1
+                continue
+
+            if token.token_type == TokenType.MULTIPLICATION:
+                left = token_types[token_index - 1]
+                right = token_types[token_index + 1]
+                operator = token_types[token_index]
+                if isinstance(left, Token):
+                    left = self.parse_number_node(left)
+
+                if isinstance(right, Token):
+                    right = self.parse_number_node(right)
+
+                token_types.pop(token_index + 1)
+                token_types.pop(token_index)
+                token_types.pop(token_index - 1)
+                token_types.insert(token_index - 1, self.parse_bin_operator_node(
+                    left=left,
+                    right=right,
+                    operator=operator
+                ))
+                delta += 2
+            elif token.token_type == TokenType.DIVISION:
+                left = token_types[token_index - 1]
+                right = token_types[token_index + 1]
+                operator = token_types[token_index]
+                if isinstance(left, Token):
+                    left = self.parse_number_node(left)
+
+                if isinstance(right, Token):
+                    right = self.parse_number_node(right)
+
+                token_types.pop(token_index + 1)
+                token_types.pop(token_index)
+                token_types.pop(token_index - 1)
+                token_types.insert(token_index - 1, self.parse_bin_operator_node(
+                    left=left,
+                    right=right,
+                    operator=operator
+                ))
+                delta += 2
+            else:
+                token_index += 1
+                delta += 1
+
+        token_index = 0
+        while token_index < len(token_types):
+            token = token_types[token_index]
+            if not isinstance(token, Token):
+                token_index += 1
+                continue
+
+            if token.token_type == TokenType.PLUS:
+                left = token_types[token_index - 1]
+                right = token_types[token_index + 1]
+                operator = token_types[token_index]
+                if isinstance(left, Token):
+                    left = self.parse_number_node(left)
+
+                if isinstance(right, Token):
+                    right = self.parse_number_node(right)
+
+                token_types.pop(token_index + 1)
+                token_types.pop(token_index)
+                token_types.pop(token_index - 1)
+                token_types.insert(token_index - 1, self.parse_bin_operator_node(
+                    left=left,
+                    right=right,
+                    operator=operator
+                ))
+                delta += 2
+            elif token.token_type == TokenType.MINUS:
+                left = token_types[token_index - 1]
+                right = token_types[token_index + 1]
+                operator = token_types[token_index]
+                if isinstance(left, Token):
+                    left = self.parse_number_node(left)
+
+                if isinstance(right, Token):
+                    right = self.parse_number_node(right)
+
+                token_types.pop(token_index + 1)
+                token_types.pop(token_index)
+                token_types.pop(token_index - 1)
+                token_types.insert(token_index - 1, self.parse_bin_operator_node(
+                    left=left,
+                    right=right,
+                    operator=operator
+                ))
+                delta += 2
+            else:
+                token_index += 1
+                delta += 1
 
         return (
-            BinOperatorNode(
-                operator=operator,
-                left_value=left,
-                right_value=right
-            ),
-            1 + right_position
+            token_types[0],
+            delta
         )
 
     def _parse_link(self, tokens: list[Token], operator_position: int):
@@ -233,7 +332,7 @@ class Parser():
             elif current_token_type in BIN_OPERATOR_TOKEN_TYPES:
                 nodes.pop()
                 bin_operator_tokens = tokens[position - 1:]
-                node, delta = self.parse_bin_operator_node(bin_operator_tokens)
+                node, delta = self.parse_bin_operator_expression(bin_operator_tokens)
                 nodes.append(node)
                 position += delta
             elif current_token_type == TokenType.LAYER_START:
