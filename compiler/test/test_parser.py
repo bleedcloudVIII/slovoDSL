@@ -3,6 +3,7 @@ from compiler.ast.parser import Parser
 from compiler.ast.nodes.common_nodes.number_node import NumberNode
 from compiler.ast.nodes.common_nodes.bin_operator_node import BinOperatorNode
 from compiler.ast.nodes.common_nodes.word_node import WordNode
+from compiler.ast.nodes.neuro_nodes.layer_node import LayerNode
 
 
 def _get_tokens(code: str):
@@ -90,3 +91,69 @@ def test_bin_operator_execute_4():
     result = Parser(tokens).parse()
     assert len(result) == 1
     assert round(result[0].execute(), 5) == round(-45.83333, 5)
+
+
+def test_empty_layer():
+    code = """ [] """
+    tokens = Lexer(code).lexer_analysis()
+
+    assert len(tokens) == 2
+
+    result = Parser(tokens).parse()
+    assert len(result) == 1
+    result = result[0]
+    assert isinstance(result, LayerNode)
+    assert result.neurons_count is None
+    assert result.function is None
+    assert result.bias is None
+
+
+def test_layer_with_neurons():
+    code = """ [80] """
+    tokens = Lexer(code).lexer_analysis()
+
+    assert len(tokens) == 3
+
+    result = Parser(tokens).parse()
+    assert len(result) == 1
+    result = result[0]
+    assert isinstance(result, LayerNode)
+    assert isinstance(result.neurons_count, NumberNode)
+    assert result.neurons_count.token.token_text == "80"
+    assert result.function is None
+    assert result.bias is None
+
+
+def test_layer_with_neurons_and_func():
+    code = """ [80, sigmoid] """
+    tokens = Lexer(code).lexer_analysis()
+
+    assert len(tokens) == 5
+
+    result = Parser(tokens).parse()
+    assert len(result) == 1
+    result = result[0]
+    assert isinstance(result, LayerNode)
+    assert isinstance(result.neurons_count, NumberNode)
+    assert result.neurons_count.token.token_text == "80"
+    assert isinstance(result.function, WordNode)
+    assert result.function.token.token_text == "sigmoid"
+    assert result.bias is None
+
+
+def test_layer_full():
+    code = """ [80, sigmoid, bias_1] """
+    tokens = Lexer(code).lexer_analysis()
+
+    assert len(tokens) == 7
+
+    result = Parser(tokens).parse()
+    assert len(result) == 1
+    result = result[0]
+    assert isinstance(result, LayerNode)
+    assert isinstance(result.neurons_count, NumberNode)
+    assert result.neurons_count.token.token_text == "80"
+    assert isinstance(result.function, WordNode)
+    assert result.function.token.token_text == "sigmoid"
+    assert isinstance(result.bias, WordNode)
+    assert result.bias.token.token_text == "bias_1"

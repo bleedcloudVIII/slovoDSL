@@ -57,10 +57,31 @@ c = BinOperatorNode(
 
 # code = """ "path/to/file.txt" """
 
-code = """ 60 + 20 - 30 * 2 + 70 / 35 """
+# code = """ 60 + 20 - 30 * 2 + 70 / 35 """
 # 80 - 60 + 70 / 35
 # 20 + 2
 # 22
+
+# code = """
+# [10] -> [60, sin]
+# """
+
+# code = """
+# [70] -> a
+# a -> [10, cos]
+# """
+
+# code ="""
+# [50] -> a
+# [90] -> [10, sigmoid] -> (a) -> [60, log] -> [3]
+# """
+
+code = """
+[]
+[10]
+[10, sigmoid]
+[10, sigmoid, kk]
+"""
 
 lexer = Lexer(code)
 
@@ -75,4 +96,4 @@ for n in nodes:
 # print(nodes[1].execute())
 
 # print(nodes)
-print(nodes[0].execute())
+# print(nodes[0].execute())

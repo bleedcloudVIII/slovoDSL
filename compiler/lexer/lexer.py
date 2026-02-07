@@ -29,7 +29,7 @@ class Lexer:
 
     def tokenize_word(self):
         string = ""
-        while self.current_symbol.isalpha():
+        while self.current_symbol not in OPERATORS:
             string += self.current_symbol
             self.position += 1
 

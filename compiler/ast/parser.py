@@ -41,24 +41,24 @@ class Parser():
     def line_tokens(self, line_position: int) -> List[Token]:
         return self.code_lines[line_position]
 
-    def parse_word_node(self, token: Token = None):
+    def parse_word_node(self, token: Token = None) -> WordNode:
         """
         token = Token
         """
         if token:
             return WordNode(token)
 
-    def parse_number_node(self, token: Token):
+    def parse_number_node(self, token: Token) -> NumberNode:
         """
         token = token
         """
         if token.token_type == TokenType.NUMBER:
             return NumberNode(token)
 
-    def parse_bin_operator_node(self, left: Node, operator: Token, right: Node):
+    def parse_bin_operator_node(self, left: Node, operator: Token, right: Node) -> BinOperatorNode:
         return BinOperatorNode(operator, left, right)
 
-    def parse_bin_operator_expression(self, tokens: list[Token]):
+    def parse_bin_operator_expression(self, tokens: list[Token]) -> tuple[Node, int]:
         """
         tokens = [left_token, operator, right_tokens[]]
         """
@@ -192,11 +192,11 @@ class Parser():
             delta
         )
 
-    def _parse_link(self, tokens: list[Token], operator_position: int):
+    def _parse_link(self, tokens: list[Token], operator_position: int) -> tuple[LinkNode, int]:
         left_tokens = tokens[:operator_position]
         right_tokens = tokens[operator_position + 1:]
 
-        left_nodes, _ = self._parse_tokens(left_tokens)
+        left_nodes, left_delta = self._parse_tokens(left_tokens)
         right_nodes, right_delta = self._parse_tokens(right_tokens)
 
         return (
@@ -204,10 +204,10 @@ class Parser():
                 left=left_nodes[0],
                 right=right_nodes[0]
             ),
-            1 + right_delta
+            1 + right_delta + left_delta
         )
 
-    def _parse_reverse_link(self, tokens: list[Token], operator_position: int):
+    def _parse_reverse_link(self, tokens: list[Token], operator_position: int) -> tuple[ReverseLinkNode, int]:
         left_tokens = tokens[:operator_position]
         right_tokens = tokens[operator_position + 1:]
 
@@ -222,86 +222,62 @@ class Parser():
             1 + right_delta
         )
 
-    def parse_layer_node(self, tokens: list[Token]):
+    def parse_layer_node(self, tokens: list[Token]) -> tuple[LayerNode, int]:
         """
         tokens = [layer_start, ..., layer_end]
         """
-        neurones_count = tokens[1]
+        expression_tokens = []
+        current_expression_tokens = []
+        for token in tokens:
+            token_type = token.token_type
+            if token_type == TokenType.LAYER_START:
+                continue
+            elif token_type in (TokenType.COMMA, TokenType.LAYER_END):
+                if current_expression_tokens:
+                    expression_tokens.append(current_expression_tokens)
+                    current_expression_tokens = []
+            else:
+                current_expression_tokens.append(token)
+        if current_expression_tokens:
+            expression_tokens.append(current_expression_tokens)
 
-        if neurones_count.token_type == TokenType.LAYER_END:
-            return (
-                LayerNode(
-                    neurons_count=None,
-                    function=None
-                ),
-                2
-            )
+        expression_len = len(expression_tokens)
 
-        if neurones_count.token_type == TokenType.COMMA:
-            func = tokens[2]
-            return (
-                LayerNode(
-                    neurons_count=None,
-                    function=self.parse_word_node(func)
-                ),
-                1 + 2
-            )
+        neurons_nodes = None
+        neurons_delta = 0
+        if expression_len >= 1:
+            neurons_tokens = expression_tokens[0]
+            neurons_nodes, neurons_delta = self._parse_tokens(neurons_tokens)
+            neurons_nodes = neurons_nodes[0]
 
-        # Берём все токены после LAYER_START и до COMMA и парсим
-        neurons_tokens = list(takewhile(
-            lambda token: token.token_type != TokenType.COMMA and token.token_type != TokenType.LAYER_END,
-            tokens[1:]
-        ))
+        func_nodes = None
+        func_delta = 0
+        if expression_len >= 2:
+            func_tokens = expression_tokens[1]
+            func_nodes, func_delta = self._parse_tokens(func_tokens)
+            func_nodes = func_nodes[0]
 
-        # Чтобы посчитать, сколько запятых в слое [...]
-        layer_tokens = list(takewhile(
-            lambda token: token.token_type != TokenType.LAYER_END,
-            tokens[1:]
-        ))
-
-        comma_count = 0
-        for token in layer_tokens:
-            if token.token_type == TokenType.COMMA:
-                comma_count += 1
-
-        neurones_count, neurons_delta = self._parse_tokens(neurons_tokens)
-        neurones_count = neurones_count[0]
-
-        if comma_count < 1:
-            return (
-                LayerNode(
-                    neurons_count=neurones_count,
-                    function=None
-                ),
-                1 + neurons_delta
-            )
-
-        func = layer_tokens[-1]
-
-        if func.token_type == TokenType.LAYER_END:
-            return (
-                LayerNode(
-                    neurons_count=neurones_count,
-                    function=None
-                ),
-                1 + neurons_delta
-            )
+        bias_nodes = None
+        bias_delta = 0
+        if expression_len >= 3:
+            bias_tokens = expression_tokens[2]
+            bias_nodes, bias_delta = self._parse_tokens(bias_tokens)
+            bias_nodes = bias_nodes[0]
 
         return (
             LayerNode(
-                neurons_count=neurones_count,
-                function=self.parse_word_node(token=func)
+                neurons_count=neurons_nodes,
+                function=func_nodes,
+                bias=bias_nodes
             ),
-            # [   exp     ,  func  ]
-            # ^   ^^^^^      ^^^^  ^
-            # 1   delta   1     2  3
-            1 + neurons_delta + 3
+            #                                            comma_count       + start_layer, end_layer
+            neurons_delta + func_delta + bias_delta + (expression_len - 1) + 2
         )
 
-    def parse_path(self, token: Token):
+    def parse_path(self, token: Token) -> tuple[PathNode, int]:
         return PathNode(path=token.token_text)
 
-    def _parse_tokens(self, tokens: List[Token] = None, position: int = None):
+    def _parse_tokens(self, tokens: List[Token] = None, position: int = None) -> tuple[list[Node], int]:
         position = 0 if position is None else position
         length = len(tokens)
 
@@ -349,7 +325,7 @@ class Parser():
 
         return nodes, position
 
-    def parse(self):
+    def parse(self) -> list[Node]:
         nodes = []
         for i in range(self.code_line_count):
             tokens = self.line_tokens(i)
