@@ -76,11 +76,15 @@ c = BinOperatorNode(
 # [90] -> [10, sigmoid] -> (a) -> [60, log] -> [3]
 # """
 
+# code = """
+# []
+# [10]
+# [10, sigmoid]
+# [10, sigmoid, kk]
+# """
+
 code = """
-[]
-[10]
-[10, sigmoid]
-[10, sigmoid, kk]
+{10 + 40, 20 * 123, 30 - 10 + 320, "asdad", "e12e12"}
 """
 
 lexer = Lexer(code)
@@ -93,6 +97,9 @@ nodes = parser.parse()
 print("-----")
 for n in nodes:
     print(n)
+    for exp in n.expressions:
+        print(exp)
+
 # print(nodes[1].execute())
 
 # print(nodes)

@@ -10,6 +10,7 @@ from typing import List
 from itertools import takewhile
 from compiler.ast.nodes.common_nodes.word_node import WordNode
 from compiler.ast.nodes.node import Node
+from compiler.ast.nodes.common_nodes.list_node import ListNode
 
 
 class Parser():
@@ -274,6 +275,40 @@ class Parser():
             neurons_delta + func_delta + bias_delta + (expression_len - 1) + 2
         )
 
+    def parse_list(self, tokens: List[Token]) -> tuple[ListNode, int]:
+        expressions = []
+        current_expression_tokens = []
+        delta = 2
+        for token in tokens:
+            token_type = token.token_type
+            if token_type == TokenType.LEFT_BRACE:
+                continue
+            elif token_type in (TokenType.COMMA, TokenType.RIGHT_BRACE, TokenType.NEW_LINE_SEPARATOR):
+                if current_expression_tokens:
+                    nodes, _delta = self._parse_tokens(current_expression_tokens)
+                    if nodes and len(nodes) == 1:
+                        expressions.append(nodes[0])
+                    else:
+                        expressions.append(nodes)
+                    delta += _delta
+                    current_expression_tokens = []
+            else:
+                delta += 1
+                current_expression_tokens.append(token)
+        if current_expression_tokens:
+            nodes, _delta = self._parse_tokens(current_expression_tokens)
+            if nodes and len(nodes) == 1:
+                expressions.append(nodes[0])
+            else:
+                expressions.append(nodes)
+            current_expression_tokens = []
+            delta += _delta
+
+        return (
+            ListNode(expressions),
+            delta
+        )
+
     def parse_path(self, token: Token) -> tuple[PathNode, int]:
         return PathNode(path=token.token_text)
 
@@ -287,41 +322,40 @@ class Parser():
         while position < length:
             current_token_type = tokens[position].token_type
 
+            node = None
+            delta = 0
             if TokenType.LINK in token_types:
                 operator_position = token_types.index(TokenType.LINK)
                 node, delta = self._parse_link(tokens, operator_position)
-                nodes.append(node)
-                position += delta
             elif TokenType.REVERSE_LINK in token_types:
                 operator_position = token_types.index(TokenType.REVERSE_LINK)
                 node, delta = self._parse_reverse_link(tokens, operator_position)
-                nodes.append(node)
-                position += delta
             elif current_token_type == TokenType.NUMBER:
                 node = self.parse_number_node(tokens[position])
-                nodes.append(node)
-                position += 1
+                delta += 1
             elif current_token_type == TokenType.WORD:
                 node = self.parse_word_node(tokens[position])
-                nodes.append(node)
-                position += 1
+                delta += 1
             elif current_token_type in BIN_OPERATOR_TOKEN_TYPES:
                 nodes.pop()
                 bin_operator_tokens = tokens[position - 1:]
                 node, delta = self.parse_bin_operator_expression(bin_operator_tokens)
-                nodes.append(node)
-                position += delta
             elif current_token_type == TokenType.LAYER_START:
                 layer_tokens = tokens[position:]
                 node, delta = self.parse_layer_node(layer_tokens)
-                nodes.append(node)
-                position += delta
             elif current_token_type == TokenType.STRING:
                 node = self.parse_path(tokens[position])
-                nodes.append(node)
-                position += 1
+                delta = 1
+            elif current_token_type == TokenType.LEFT_BRACE:
+                list_tokens = tokens[position:]
+                node, delta = self.parse_list(list_tokens)
             else:
                 position += 1
+                continue
+
+            if node is not None:
+                nodes.append(node)
+            position += delta
 
         return nodes, position
 
