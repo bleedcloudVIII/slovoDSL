@@ -127,7 +127,7 @@ def test_layer_with_neurons():
 
 
 def test_layer_with_neurons_and_func():
-    code = """ [80, sigmoid] """
+    code = """ [80; sigmoid] """
     tokens = Lexer(code).lexer_analysis()
 
     assert len(tokens) == 5
@@ -144,7 +144,7 @@ def test_layer_with_neurons_and_func():
 
 
 def test_layer_full():
-    code = """ [80, sigmoid, bias_1] """
+    code = """ [80; sigmoid; bias_1] """
     tokens = Lexer(code).lexer_analysis()
 
     assert len(tokens) == 7

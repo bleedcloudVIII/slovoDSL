@@ -22,6 +22,7 @@ class TokenType(Enum):
     LAYER_START = auto()
     LAYER_END = auto()
     NEW_LINE_SEPARATOR = auto()
+    SEMICOLON = auto()
 
     def __repr__(self):
         return f"{self.name}"

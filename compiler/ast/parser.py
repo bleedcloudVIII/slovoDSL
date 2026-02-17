@@ -234,7 +234,7 @@ class Parser():
             token_type = token.token_type
             if token_type == TokenType.LAYER_START:
                 continue
-            elif token_type in (TokenType.COMMA, TokenType.LAYER_END):
+            elif token_type in (TokenType.SEMICOLON, TokenType.LAYER_END):
                 if current_expression_tokens:
                     expression_tokens.append(current_expression_tokens)
                     current_expression_tokens = []

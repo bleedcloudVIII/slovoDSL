@@ -21,6 +21,7 @@ class Operator(Enum):
     REVERSE_LINK = ("<-", TokenType.REVERSE_LINK)
     LAYER_START = ("[", TokenType.LAYER_START)
     LAYER_END = ("]", TokenType.LAYER_END)
+    SEMICOLON = (";", TokenType.SEMICOLON)
     STRING = (STRING_OPERATOR, TokenType.STRING)
     NEW_LINE_SEPARATOR = (NEW_LINE_OPERATOR, TokenType.NEW_LINE_SEPARATOR)
 
