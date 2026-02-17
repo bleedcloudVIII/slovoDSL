@@ -11,6 +11,7 @@ from itertools import takewhile
 from compiler.ast.nodes.common_nodes.word_node import WordNode
 from compiler.ast.nodes.node import Node
 from compiler.ast.nodes.common_nodes.list_node import ListNode
+from utils.safe_get import safe_get
 
 
 class Parser():
@@ -244,35 +245,24 @@ class Parser():
 
         expression_len = len(expression_tokens)
 
-        neurons_nodes = None
-        neurons_delta = 0
-        if expression_len >= 1:
-            neurons_tokens = expression_tokens[0]
-            neurons_nodes, neurons_delta = self._parse_tokens(neurons_tokens)
-            neurons_nodes = neurons_nodes[0]
+        delta = 0
+        nodes = []
 
-        func_nodes = None
-        func_delta = 0
-        if expression_len >= 2:
-            func_tokens = expression_tokens[1]
-            func_nodes, func_delta = self._parse_tokens(func_tokens)
-            func_nodes = func_nodes[0]
+        for i in range(expression_len):
+            node, node_delta = self._parse_tokens(expression_tokens[i])
+            nodes.append(node[0])
+            delta += node_delta
 
-        bias_nodes = None
-        bias_delta = 0
-        if expression_len >= 3:
-            bias_tokens = expression_tokens[2]
-            bias_nodes, bias_delta = self._parse_tokens(bias_tokens)
-            bias_nodes = bias_nodes[0]
+        # TODO Сделать проверку на тип для нод, чтобы понимать, что передаётся. Функция или всё таки базис
 
         return (
             LayerNode(
-                neurons_count=neurons_nodes,
-                function=func_nodes,
-                bias=bias_nodes
+                neurons_count=safe_get(nodes, 0),
+                function=safe_get(nodes, 1),
+                bias=safe_get(nodes, 2)
             ),
-            #                                            comma_count       + start_layer, end_layer
-            neurons_delta + func_delta + bias_delta + (expression_len - 1) + 2
+            #          comma_count       + start_layer, end_layer
+            delta + (expression_len - 1) + 2
         )
 
     def parse_list(self, tokens: List[Token]) -> tuple[ListNode, int]:
