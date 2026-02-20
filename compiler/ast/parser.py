@@ -11,6 +11,7 @@ from itertools import takewhile
 from compiler.ast.nodes.common_nodes.word_node import WordNode
 from compiler.ast.nodes.node import Node
 from compiler.ast.nodes.common_nodes.list_node import ListNode
+from compiler.ast.nodes.neuro_nodes.kernel_node import KernelNode
 from utils.safe_get import safe_get
 
 
@@ -302,6 +303,47 @@ class Parser():
     def parse_path(self, token: Token) -> tuple[PathNode, int]:
         return PathNode(path=token.token_text)
 
+    def parse_kernel_node(self, tokens: list[Token]) -> tuple[LayerNode, int]:
+        """
+        tokens = [layer_start, ..., layer_end]
+        """
+        expression_tokens = []
+        current_expression_tokens = []
+        for token in tokens:
+            token_type = token.token_type
+            if token_type == TokenType.LEFT_PARENTHESES:
+                continue
+            elif token_type in (TokenType.SEMICOLON, TokenType.RIGHT_PARENTHESES):
+                if current_expression_tokens:
+                    expression_tokens.append(current_expression_tokens)
+                    current_expression_tokens = []
+            else:
+                current_expression_tokens.append(token)
+        if current_expression_tokens:
+            expression_tokens.append(current_expression_tokens)
+
+        expression_len = len(expression_tokens)
+
+        delta = 0
+        nodes = []
+
+        for i in range(expression_len):
+            node, node_delta = self._parse_tokens(expression_tokens[i])
+            nodes.append(node[0])
+            delta += node_delta
+
+        # TODO Сделать проверку на тип для нод, чтобы понимать, что передаётся. Функция или всё таки базис
+
+        return (
+            KernelNode(
+                columns=safe_get(nodes, 0),
+                rows=safe_get(nodes, 1),
+                function=safe_get(nodes, 2)
+            ),
+            #          comma_count       + start_layer, end_layer
+            delta + (expression_len - 1) + 2
+        )
+
     def _parse_tokens(self, tokens: List[Token] = None, position: int = None) -> tuple[list[Node], int]:
         position = 0 if position is None else position
         length = len(tokens)
@@ -339,6 +381,9 @@ class Parser():
             elif current_token_type == TokenType.LEFT_BRACE:
                 list_tokens = tokens[position:]
                 node, delta = self.parse_list(list_tokens)
+            elif current_token_type == TokenType.LEFT_PARENTHESES:
+                kernel_tokens = tokens[position:]
+                node, delta = self.parse_kernel_node(kernel_tokens)
             else:
                 position += 1
                 continue

@@ -18,7 +18,6 @@ class LayerNode(Node):
         self.bias = bias
 
     def execute(self):
-        # TODO Что-то делать
         return None
 
     def __str__(self):
@@ -35,7 +34,14 @@ class LayerNode(Node):
         return f"LayerNode<{neurons_count}, {func}, {bias}>"
 
     def __repr__(self):
-        neurons_count = self.neurons_count if self.neurons_count else None
+        neurons_count = self.neurons_count or None
         func = self.function.token.token_text if self.function else None
-        bias = self.bias.token.token_text if self.bias else None
+        bias = None
+
+        if isinstance(self.bias, WordNode):
+            bias = self.bias.token.token_text
+
+        if isinstance(self.bias, ListNode):
+            bias = str(self.bias)
+
         return f"LayerNode<{neurons_count}, {func}, {bias}>"

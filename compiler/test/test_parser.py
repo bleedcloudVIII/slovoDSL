@@ -5,6 +5,7 @@ from compiler.ast.nodes.common_nodes.bin_operator_node import BinOperatorNode
 from compiler.ast.nodes.common_nodes.word_node import WordNode
 from compiler.ast.nodes.common_nodes.list_node import ListNode
 from compiler.ast.nodes.neuro_nodes.layer_node import LayerNode
+from compiler.ast.nodes.neuro_nodes.kernel_node import KernelNode
 from compiler.common.token_type import TokenType
 
 
@@ -226,3 +227,69 @@ def test_list_node_2():
     assert result.expressions[2].right_value.operator == tokens[12]
     assert result.expressions[2].right_value.operator.token_type == TokenType.MULTIPLICATION
     assert result.expressions[2].right_value.right_value.token == tokens[13]
+
+
+def test_empty_kernel():
+    code = """ () """
+    tokens = Lexer(code).lexer_analysis()
+
+    assert len(tokens) == 2
+
+    result = Parser(tokens).parse()
+    assert len(result) == 1
+    result = result[0]
+    assert isinstance(result, KernelNode)
+    assert result.columns is None
+    assert result.rows is None
+    assert result.function is None
+
+
+def test_kernel_with_columns():
+    code = """ (3) """
+    tokens = Lexer(code).lexer_analysis()
+
+    assert len(tokens) == 3
+
+    result = Parser(tokens).parse()
+    assert len(result) == 1
+    result = result[0]
+    assert isinstance(result, KernelNode)
+    assert isinstance(result.columns, NumberNode)
+    assert result.columns.token == tokens[1]
+    assert result.rows is None
+    assert result.function is None
+
+
+def test_kernel_with_sizes():
+    code = """ (3; 4) """
+    tokens = Lexer(code).lexer_analysis()
+
+    assert len(tokens) == 5
+
+    result = Parser(tokens).parse()
+    assert len(result) == 1
+    result = result[0]
+    assert isinstance(result, KernelNode)
+    assert isinstance(result.columns, NumberNode)
+    assert result.columns.token == tokens[1]
+    assert isinstance(result.rows, NumberNode)
+    assert result.rows.token == tokens[3]
+    assert result.function is None
+
+
+def test_kernel_full():
+    code = """ (3; 4; softmax) """
+    tokens = Lexer(code).lexer_analysis()
+
+    assert len(tokens) == 7
+
+    result = Parser(tokens).parse()
+    assert len(result) == 1
+    result = result[0]
+    assert isinstance(result, KernelNode)
+    assert isinstance(result.columns, NumberNode)
+    assert result.columns.token == tokens[1]
+    assert isinstance(result.rows, NumberNode)
+    assert result.rows.token == tokens[3]
+    assert isinstance(result.function, WordNode)
+    assert result.function.token == tokens[5]
