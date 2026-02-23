@@ -9,11 +9,13 @@ class Conv2dNode(Node):
         self,
         kernel_size: Optional[ListNode | WordNode] = None,
         offset: Optional[ListNode | WordNode] = None,
-        padding: Optional[ListNode | WordNode] = None
+        padding: Optional[ListNode | WordNode] = None,
+        dependencies: Optional[ListNode] = []
     ):
         self.kernel_size = kernel_size
         self.offset = offset
         self.padding = padding
+        self.dependencies = dependencies
 
     def execute(self):
         return None

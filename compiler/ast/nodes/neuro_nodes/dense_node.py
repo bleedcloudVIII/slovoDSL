@@ -9,18 +9,18 @@ class DenseNode(Node):
     def __init__(
         self,
         input_size: Optional[NumberNode] = None,
-        function: Optional[WordNode] = None,
-        bias: Optional[ListNode | WordNode] = None
+        value: Optional[WordNode | ListNode] = None,
+        dependencies: Optional[ListNode] = []
     ):
         self.input_size = input_size
-        self.function = function
-        self.bias = bias
+        self.value = value
+        self.dependencies = dependencies
 
     def execute(self):
         return None
 
     def __str__(self):
-        return f"DenseNode<{self.input_size}, {self.function}, {self.bias}>"
+        return f"DenseNode<{self.input_size}, {self.value}>"
 
     def __repr__(self):
-        return f"DenseNode<{self.input_size}, {self.function}, {self.bias}>"
+        return f"DenseNode<{self.input_size}, {self.value}>"
