@@ -2,10 +2,12 @@ from enum import Enum
 # from compiler.ast.nodes.neuro_nodes.layer_node import LayerNode
 from compiler.ast.nodes.node import Node
 from compiler.ast.nodes.neuro_nodes.dense_node import DenseNode
+from compiler.ast.nodes.neuro_nodes.conv2d_node import Conv2dNode
 
 
 class KeyWord(Enum):
     DENSE = ("Dense", DenseNode)
+    CONV2D = ("Conv2d", Conv2dNode)
     # LAYER = ("layer", LayerNode)
     # Пока такого нет
     pass

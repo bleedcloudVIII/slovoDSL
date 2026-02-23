@@ -27,6 +27,10 @@ space <- "c.txt"
 
 ##### Dense
 ```
+Dense(input_size; function; bias)
+```
+
+```
 Dense(50; sigmoid; bias)
 ```
 
@@ -50,5 +54,10 @@ Dense(80) -> Dense(20; cos; bias_1) -> Dense(30)
 ```
 
 ### Свёрточные слои
+```
+Conv2d(kernel_size; offset; padding)
+```
 
-TODO
+```
+Conv2d({3, 3}; {1, 1}; {1; 2; 0})
+```

@@ -5,6 +5,7 @@ from compiler.ast.nodes.common_nodes.bin_operator_node import BinOperatorNode
 from compiler.ast.nodes.common_nodes.word_node import WordNode
 from compiler.ast.nodes.common_nodes.list_node import ListNode
 from compiler.ast.nodes.neuro_nodes.dense_node import DenseNode
+from compiler.ast.nodes.neuro_nodes.conv2d_node import Conv2dNode
 from compiler.common.token_type import TokenType
 
 
@@ -95,7 +96,7 @@ def test_bin_operator_execute_4():
     assert round(result[0].execute(), 5) == round(-45.83333, 5)
 
 
-def test_empty_layer():
+def test_empty_dense_layer():
     code = """ Dense() """
     tokens = Lexer(code).lexer_analysis()
 
@@ -110,7 +111,7 @@ def test_empty_layer():
     assert result.bias is None
 
 
-def test_layer_with_neurons():
+def test_dense_layer_with_neurons():
     code = """ Dense(80) """
     tokens = Lexer(code).lexer_analysis()
 
@@ -126,7 +127,7 @@ def test_layer_with_neurons():
     assert result.bias is None
 
 
-def test_layer_with_neurons_and_func():
+def test_dense_layer_with_neurons_and_func():
     code = """ Dense(80; sigmoid) """
     tokens = Lexer(code).lexer_analysis()
 
@@ -143,7 +144,7 @@ def test_layer_with_neurons_and_func():
     assert result.bias is None
 
 
-def test_layer_full():
+def test_dense_layer_full():
     code = """ Dense(80; sigmoid; bias_1) """
     tokens = Lexer(code).lexer_analysis()
 
@@ -227,6 +228,91 @@ def test_list_node_2():
     assert result.expressions[2].right_value.operator.token_type == TokenType.MULTIPLICATION
     assert result.expressions[2].right_value.right_value.token == tokens[13]
 
+
+def test_empty_conv2d_layer():
+    code = """ Conv2d() """
+    tokens = Lexer(code).lexer_analysis()
+
+    assert len(tokens) == 3
+
+    result = Parser(tokens).parse()
+    assert len(result) == 1
+    result = result[0]
+    assert isinstance(result, Conv2dNode)
+    assert result.kernel_size is None
+    assert result.offset is None
+    assert result.padding is None
+
+
+def test_conv2d_layer_with_neurons_1():
+    code = """ Conv2d(kernel) """
+    tokens = Lexer(code).lexer_analysis()
+
+    assert len(tokens) == 4
+
+    result = Parser(tokens).parse()
+    assert len(result) == 1
+    result = result[0]
+    assert isinstance(result, Conv2dNode)
+    assert isinstance(result.kernel_size, WordNode)
+    assert result.kernel_size.token == tokens[2]
+    assert result.offset is None
+    assert result.padding is None
+
+
+def test_conv2d_layer_with_neurons_2():
+    code = """ Conv2d({12, 23}) """
+    tokens = Lexer(code).lexer_analysis()
+
+    assert len(tokens) == 8
+
+    result = Parser(tokens).parse()
+    assert len(result) == 1
+    result = result[0]
+    assert isinstance(result, Conv2dNode)
+    assert isinstance(result.kernel_size, ListNode)
+    assert result.kernel_size.expressions[0].token == tokens[3]
+    assert result.kernel_size.expressions[1].token == tokens[5]
+    assert result.offset is None
+    assert result.padding is None
+
+
+def test_conv2d_layer_with_neurons_and_func():
+    code = """ Conv2d(kernel; offset) """
+    tokens = Lexer(code).lexer_analysis()
+
+    assert len(tokens) == 6
+
+    result = Parser(tokens).parse()
+    assert len(result) == 1
+    result = result[0]
+    assert isinstance(result, Conv2dNode)
+    assert isinstance(result.kernel_size, WordNode)
+    assert result.kernel_size.token == tokens[2]
+    assert isinstance(result.offset, WordNode)
+    assert result.offset.token == tokens[4]
+    assert result.padding is None
+
+
+def test_conv2d_layer_full():
+    code = """ Conv2d(kernel; {1, 2}; {1, 2, 3}) """
+    tokens = Lexer(code).lexer_analysis()
+
+    assert len(tokens) == 18
+
+    result = Parser(tokens).parse()
+    assert len(result) == 1
+    result = result[0]
+    assert isinstance(result, Conv2dNode)
+    assert isinstance(result.kernel_size, WordNode)
+    assert result.kernel_size.token == tokens[2]
+    assert isinstance(result.offset, ListNode)
+    assert result.offset.expressions[0].token == tokens[5]
+    assert result.offset.expressions[1].token == tokens[7]
+    assert isinstance(result.padding, ListNode)
+    assert result.padding.expressions[0].token == tokens[11]
+    assert result.padding.expressions[1].token == tokens[13]
+    assert result.padding.expressions[2].token == tokens[15]
 
 # def test_empty_kernel():
 #     code = """ () """
