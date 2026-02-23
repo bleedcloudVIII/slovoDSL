@@ -4,8 +4,7 @@ from compiler.ast.nodes.common_nodes.number_node import NumberNode
 from compiler.ast.nodes.common_nodes.bin_operator_node import BinOperatorNode
 from compiler.ast.nodes.common_nodes.word_node import WordNode
 from compiler.ast.nodes.common_nodes.list_node import ListNode
-from compiler.ast.nodes.neuro_nodes.layer_node import LayerNode
-from compiler.ast.nodes.neuro_nodes.kernel_node import KernelNode
+from compiler.ast.nodes.neuro_nodes.dense_node import DenseNode
 from compiler.common.token_type import TokenType
 
 
@@ -97,22 +96,7 @@ def test_bin_operator_execute_4():
 
 
 def test_empty_layer():
-    code = """ [] """
-    tokens = Lexer(code).lexer_analysis()
-
-    assert len(tokens) == 2
-
-    result = Parser(tokens).parse()
-    assert len(result) == 1
-    result = result[0]
-    assert isinstance(result, LayerNode)
-    assert result.neurons_count is None
-    assert result.function is None
-    assert result.bias is None
-
-
-def test_layer_with_neurons():
-    code = """ [80] """
+    code = """ Dense() """
     tokens = Lexer(code).lexer_analysis()
 
     assert len(tokens) == 3
@@ -120,46 +104,61 @@ def test_layer_with_neurons():
     result = Parser(tokens).parse()
     assert len(result) == 1
     result = result[0]
-    assert isinstance(result, LayerNode)
-    assert isinstance(result.neurons_count, NumberNode)
-    assert result.neurons_count.token == tokens[1]
+    assert isinstance(result, DenseNode)
+    assert result.input_size is None
+    assert result.function is None
+    assert result.bias is None
+
+
+def test_layer_with_neurons():
+    code = """ Dense(80) """
+    tokens = Lexer(code).lexer_analysis()
+
+    assert len(tokens) == 4
+
+    result = Parser(tokens).parse()
+    assert len(result) == 1
+    result = result[0]
+    assert isinstance(result, DenseNode)
+    assert isinstance(result.input_size, NumberNode)
+    assert result.input_size.token == tokens[2]
     assert result.function is None
     assert result.bias is None
 
 
 def test_layer_with_neurons_and_func():
-    code = """ [80; sigmoid] """
+    code = """ Dense(80; sigmoid) """
     tokens = Lexer(code).lexer_analysis()
 
-    assert len(tokens) == 5
+    assert len(tokens) == 6
 
     result = Parser(tokens).parse()
     assert len(result) == 1
     result = result[0]
-    assert isinstance(result, LayerNode)
-    assert isinstance(result.neurons_count, NumberNode)
-    assert result.neurons_count.token == tokens[1]
+    assert isinstance(result, DenseNode)
+    assert isinstance(result.input_size, NumberNode)
+    assert result.input_size.token == tokens[2]
     assert isinstance(result.function, WordNode)
-    assert result.function.token == tokens[3]
+    assert result.function.token == tokens[4]
     assert result.bias is None
 
 
 def test_layer_full():
-    code = """ [80; sigmoid; bias_1] """
+    code = """ Dense(80; sigmoid; bias_1) """
     tokens = Lexer(code).lexer_analysis()
 
-    assert len(tokens) == 7
+    assert len(tokens) == 8
 
     result = Parser(tokens).parse()
     assert len(result) == 1
     result = result[0]
-    assert isinstance(result, LayerNode)
-    assert isinstance(result.neurons_count, NumberNode)
-    assert result.neurons_count.token == tokens[1]
+    assert isinstance(result, DenseNode)
+    assert isinstance(result.input_size, NumberNode)
+    assert result.input_size.token == tokens[2]
     assert isinstance(result.function, WordNode)
-    assert result.function.token == tokens[3]
+    assert result.function.token == tokens[4]
     assert isinstance(result.bias, WordNode)
-    assert result.bias.token == tokens[5]
+    assert result.bias.token == tokens[6]
 
 
 def test_list_node_1():
@@ -229,67 +228,67 @@ def test_list_node_2():
     assert result.expressions[2].right_value.right_value.token == tokens[13]
 
 
-def test_empty_kernel():
-    code = """ () """
-    tokens = Lexer(code).lexer_analysis()
+# def test_empty_kernel():
+#     code = """ () """
+#     tokens = Lexer(code).lexer_analysis()
 
-    assert len(tokens) == 2
+#     assert len(tokens) == 2
 
-    result = Parser(tokens).parse()
-    assert len(result) == 1
-    result = result[0]
-    assert isinstance(result, KernelNode)
-    assert result.columns is None
-    assert result.rows is None
-    assert result.function is None
-
-
-def test_kernel_with_columns():
-    code = """ (3) """
-    tokens = Lexer(code).lexer_analysis()
-
-    assert len(tokens) == 3
-
-    result = Parser(tokens).parse()
-    assert len(result) == 1
-    result = result[0]
-    assert isinstance(result, KernelNode)
-    assert isinstance(result.columns, NumberNode)
-    assert result.columns.token == tokens[1]
-    assert result.rows is None
-    assert result.function is None
+#     result = Parser(tokens).parse()
+#     assert len(result) == 1
+#     result = result[0]
+#     assert isinstance(result, KernelNode)
+#     assert result.columns is None
+#     assert result.rows is None
+#     assert result.function is None
 
 
-def test_kernel_with_sizes():
-    code = """ (3; 4) """
-    tokens = Lexer(code).lexer_analysis()
+# def test_kernel_with_columns():
+#     code = """ (3) """
+#     tokens = Lexer(code).lexer_analysis()
 
-    assert len(tokens) == 5
+#     assert len(tokens) == 3
 
-    result = Parser(tokens).parse()
-    assert len(result) == 1
-    result = result[0]
-    assert isinstance(result, KernelNode)
-    assert isinstance(result.columns, NumberNode)
-    assert result.columns.token == tokens[1]
-    assert isinstance(result.rows, NumberNode)
-    assert result.rows.token == tokens[3]
-    assert result.function is None
+#     result = Parser(tokens).parse()
+#     assert len(result) == 1
+#     result = result[0]
+#     assert isinstance(result, KernelNode)
+#     assert isinstance(result.columns, NumberNode)
+#     assert result.columns.token == tokens[1]
+#     assert result.rows is None
+#     assert result.function is None
 
 
-def test_kernel_full():
-    code = """ (3; 4; softmax) """
-    tokens = Lexer(code).lexer_analysis()
+# def test_kernel_with_sizes():
+#     code = """ (3; 4) """
+#     tokens = Lexer(code).lexer_analysis()
 
-    assert len(tokens) == 7
+#     assert len(tokens) == 5
 
-    result = Parser(tokens).parse()
-    assert len(result) == 1
-    result = result[0]
-    assert isinstance(result, KernelNode)
-    assert isinstance(result.columns, NumberNode)
-    assert result.columns.token == tokens[1]
-    assert isinstance(result.rows, NumberNode)
-    assert result.rows.token == tokens[3]
-    assert isinstance(result.function, WordNode)
-    assert result.function.token == tokens[5]
+#     result = Parser(tokens).parse()
+#     assert len(result) == 1
+#     result = result[0]
+#     assert isinstance(result, KernelNode)
+#     assert isinstance(result.columns, NumberNode)
+#     assert result.columns.token == tokens[1]
+#     assert isinstance(result.rows, NumberNode)
+#     assert result.rows.token == tokens[3]
+#     assert result.function is None
+
+
+# def test_kernel_full():
+#     code = """ (3; 4; softmax) """
+#     tokens = Lexer(code).lexer_analysis()
+
+#     assert len(tokens) == 7
+
+#     result = Parser(tokens).parse()
+#     assert len(result) == 1
+#     result = result[0]
+#     assert isinstance(result, KernelNode)
+#     assert isinstance(result.columns, NumberNode)
+#     assert result.columns.token == tokens[1]
+#     assert isinstance(result.rows, NumberNode)
+#     assert result.rows.token == tokens[3]
+#     assert isinstance(result.function, WordNode)
+#     assert result.function.token == tokens[5]
