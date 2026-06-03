@@ -1,3 +1,7 @@
+from compiler.ast.nodes.common_nodes.reverse_link_node import ReverseLinkNode
+from compiler.ast.nodes.neuro_nodes.avg_pooling_node import AvgPoolingNode
+from compiler.ast.nodes.neuro_nodes.max_pooling_node import MaxPoolingNode
+from compiler.common.token import Token
 from compiler.lexer.lexer import Lexer
 from compiler.ast.parser import Parser
 from compiler.ast.nodes.common_nodes.number_node import NumberNode
@@ -107,8 +111,8 @@ def test_empty_dense_layer():
     result = result[0]
     assert isinstance(result, DenseNode)
     assert result.input_size is None
-    assert result.function is None
-    assert result.bias is None
+    assert result.value is None
+    assert result.dependencies == []
 
 
 def test_dense_layer_with_neurons():
@@ -123,8 +127,8 @@ def test_dense_layer_with_neurons():
     assert isinstance(result, DenseNode)
     assert isinstance(result.input_size, NumberNode)
     assert result.input_size.token == tokens[2]
-    assert result.function is None
-    assert result.bias is None
+    assert result.value is None
+    assert result.dependencies == []
 
 
 def test_dense_layer_with_neurons_and_func():
@@ -139,9 +143,8 @@ def test_dense_layer_with_neurons_and_func():
     assert isinstance(result, DenseNode)
     assert isinstance(result.input_size, NumberNode)
     assert result.input_size.token == tokens[2]
-    assert isinstance(result.function, WordNode)
-    assert result.function.token == tokens[4]
-    assert result.bias is None
+    assert isinstance(result.value, WordNode)
+    assert result.value.token == tokens[4]
 
 
 def test_dense_layer_full():
@@ -156,10 +159,10 @@ def test_dense_layer_full():
     assert isinstance(result, DenseNode)
     assert isinstance(result.input_size, NumberNode)
     assert result.input_size.token == tokens[2]
-    assert isinstance(result.function, WordNode)
-    assert result.function.token == tokens[4]
-    assert isinstance(result.bias, WordNode)
-    assert result.bias.token == tokens[6]
+    assert isinstance(result.value, WordNode)
+    assert result.value.token == tokens[4]
+    assert isinstance(result.dependencies, WordNode)
+    assert result.dependencies.token == tokens[6]
 
 
 def test_list_node_1():
@@ -314,67 +317,108 @@ def test_conv2d_layer_full():
     assert result.padding.expressions[1].token == tokens[13]
     assert result.padding.expressions[2].token == tokens[15]
 
-# def test_empty_kernel():
-#     code = """ () """
-#     tokens = Lexer(code).lexer_analysis()
 
-#     assert len(tokens) == 2
+def test_parse_max_pooling():
+    code = "a <- MaxPooling(2)"
+    lexer = Lexer(code)
+    tokens = lexer.lexer_analysis()
+    parser = Parser(tokens)
+    nodes = parser.parse()
 
-#     result = Parser(tokens).parse()
-#     assert len(result) == 1
-#     result = result[0]
-#     assert isinstance(result, KernelNode)
-#     assert result.columns is None
-#     assert result.rows is None
-#     assert result.function is None
-
-
-# def test_kernel_with_columns():
-#     code = """ (3) """
-#     tokens = Lexer(code).lexer_analysis()
-
-#     assert len(tokens) == 3
-
-#     result = Parser(tokens).parse()
-#     assert len(result) == 1
-#     result = result[0]
-#     assert isinstance(result, KernelNode)
-#     assert isinstance(result.columns, NumberNode)
-#     assert result.columns.token == tokens[1]
-#     assert result.rows is None
-#     assert result.function is None
+    assert len(nodes) == 1
+    assert isinstance(nodes[0], ReverseLinkNode)
+    assert isinstance(nodes[0].right, MaxPoolingNode)
+    assert str(nodes[0].right.pool_size) == "NumberNode<2>"
 
 
-# def test_kernel_with_sizes():
-#     code = """ (3; 4) """
-#     tokens = Lexer(code).lexer_analysis()
+def test_parse_avg_pooling():
+    code = "b <- AvgPooling(3)"
+    lexer = Lexer(code)
+    tokens = lexer.lexer_analysis()
+    parser = Parser(tokens)
+    nodes = parser.parse()
 
-#     assert len(tokens) == 5
-
-#     result = Parser(tokens).parse()
-#     assert len(result) == 1
-#     result = result[0]
-#     assert isinstance(result, KernelNode)
-#     assert isinstance(result.columns, NumberNode)
-#     assert result.columns.token == tokens[1]
-#     assert isinstance(result.rows, NumberNode)
-#     assert result.rows.token == tokens[3]
-#     assert result.function is None
+    assert len(nodes) == 1
+    assert isinstance(nodes[0], ReverseLinkNode)
+    assert isinstance(nodes[0].right, AvgPoolingNode)
+    assert str(nodes[0].right.pool_size) == "NumberNode<3>"
 
 
-# def test_kernel_full():
-#     code = """ (3; 4; softmax) """
-#     tokens = Lexer(code).lexer_analysis()
+def test_parse_multiple_pooling():
+    code = """
+    a <- MaxPooling(2)
+    b <- AvgPooling(2)
+    """
+    lexer = Lexer(code)
+    tokens = lexer.lexer_analysis()
+    parser = Parser(tokens)
+    nodes = parser.parse()
 
-#     assert len(tokens) == 7
+    assert len(nodes) == 2
+    assert isinstance(nodes[0].right, MaxPoolingNode)
+    assert isinstance(nodes[1].right, AvgPoolingNode)
 
-#     result = Parser(tokens).parse()
-#     assert len(result) == 1
-#     result = result[0]
-#     assert isinstance(result, KernelNode)
-#     assert isinstance(result.columns, NumberNode)
-#     assert result.columns.token == tokens[1]
-#     assert isinstance(result.rows, NumberNode)
-#     assert result.rows.token == tokens[3]
-#     assert isinstance(result.function, WordNode)
-#     assert result.function.token == tokens[5]
+
+def test_parse_pooling_chain():
+    code = """
+    a <- Conv2d(32; relu)
+    a <- MaxPooling(2)
+    """
+    lexer = Lexer(code)
+    tokens = lexer.lexer_analysis()
+    parser = Parser(tokens)
+    nodes = parser.parse()
+
+    assert len(nodes) == 2
+    assert str(nodes[0].right).startswith("Conv2DNode")
+    assert isinstance(nodes[1].right, MaxPoolingNode)
+
+
+def test_create_max_pooling():
+    pool_size = NumberNode(Token(TokenType.NUMBER, "2"))
+    node = MaxPoolingNode(pool_size=pool_size)
+
+    assert node.pool_size == pool_size
+    assert node.stride == pool_size
+
+
+def test_max_pooling_with_custom_stride():
+    pool_size = NumberNode(Token(TokenType.NUMBER, "2"))
+    stride = NumberNode(Token(TokenType.NUMBER, "1"))
+    node = MaxPoolingNode(pool_size=pool_size, stride=stride)
+
+    assert node.pool_size == pool_size
+    assert node.stride == stride
+
+
+def test_max_pooling_str_repr():
+    pool_size = NumberNode(Token(TokenType.NUMBER, "3"))
+    node = MaxPoolingNode(pool_size=pool_size)
+
+    assert "MaxPoolingNode" in str(node)
+    assert "3" in str(node)
+
+
+def test_create_avg_pooling():
+    pool_size = NumberNode(Token(TokenType.NUMBER, "2"))
+    node = AvgPoolingNode(pool_size=pool_size)
+
+    assert node.pool_size == pool_size
+    assert node.stride == pool_size
+
+
+def test_avg_pooling_with_custom_stride():
+    pool_size = NumberNode(Token(TokenType.NUMBER, "3"))
+    stride = NumberNode(Token(TokenType.NUMBER, "2"))
+    node = AvgPoolingNode(pool_size=pool_size, stride=stride)
+
+    assert node.pool_size == pool_size
+    assert node.stride == stride
+
+
+def test_avg_pooling_str_repr():
+    pool_size = NumberNode(Token(TokenType.NUMBER, "4"))
+    node = AvgPoolingNode(pool_size=pool_size)
+
+    assert "AvgPoolingNode" in str(node)
+    assert "4" in str(node)

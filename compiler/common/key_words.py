@@ -3,11 +3,15 @@ from enum import Enum
 from compiler.ast.nodes.node import Node
 from compiler.ast.nodes.neuro_nodes.dense_node import DenseNode
 from compiler.ast.nodes.neuro_nodes.conv2d_node import Conv2dNode
+from compiler.ast.nodes.neuro_nodes.max_pooling_node import MaxPoolingNode
+from compiler.ast.nodes.neuro_nodes.avg_pooling_node import AvgPoolingNode
 
 
 class KeyWord(Enum):
     DENSE = ("Dense", DenseNode)
     CONV2D = ("Conv2d", Conv2dNode)
+    MAX_POOLING = ("MaxPooling", MaxPoolingNode)
+    AVG_POOLING = ("AvgPooling", AvgPoolingNode)
     # LAYER = ("layer", LayerNode)
     # Пока такого нет
     pass
