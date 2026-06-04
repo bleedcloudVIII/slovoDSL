@@ -1,6 +1,9 @@
 from compiler.ast.nodes.common_nodes.reverse_link_node import ReverseLinkNode
 from compiler.ast.nodes.neuro_nodes.avg_pooling_node import AvgPoolingNode
+from compiler.ast.nodes.neuro_nodes.batch_norm import BatchNormNode
+from compiler.ast.nodes.neuro_nodes.dropout_node import DropoutNode
 from compiler.ast.nodes.neuro_nodes.max_pooling_node import MaxPoolingNode
+from compiler.ast.nodes.neuro_nodes.relu_node import ReLUNode
 from compiler.common.token import Token
 from compiler.lexer.lexer import Lexer
 from compiler.ast.parser import Parser
@@ -112,7 +115,7 @@ def test_empty_dense_layer():
     assert isinstance(result, DenseNode)
     assert result.input_size is None
     assert result.value is None
-    assert result.dependencies == []
+    assert result.dependencies is None
 
 
 def test_dense_layer_with_neurons():
@@ -128,7 +131,7 @@ def test_dense_layer_with_neurons():
     assert isinstance(result.input_size, NumberNode)
     assert result.input_size.token == tokens[2]
     assert result.value is None
-    assert result.dependencies == []
+    assert result.dependencies is None
 
 
 def test_dense_layer_with_neurons_and_func():
@@ -422,3 +425,57 @@ def test_avg_pooling_str_repr():
 
     assert "AvgPoolingNode" in str(node)
     assert "4" in str(node)
+    
+
+def parse(code: str):
+    tokens = Lexer(code).lexer_analysis()
+    return Parser(tokens).parse()
+
+
+def test_dense_simple():
+    nodes = parse('a <- Dense(60)')
+    assert len(nodes) == 1
+    assert isinstance(nodes[0], ReverseLinkNode)
+    assert isinstance(nodes[0].right, DenseNode)
+
+
+def test_dense_with_activation():
+    nodes = parse('a <- Dense(60; sigmoid)')
+    assert isinstance(nodes[0].right, DenseNode)
+    assert nodes[0].right.value is not None
+
+
+def test_dense_with_dependencies():
+    nodes = parse('c <- Dense(7; sigmoid; {a, b})')
+    dense = nodes[0].right
+    assert isinstance(dense, DenseNode)
+    assert dense.dependencies is not None
+
+
+def test_conv2d_simple():
+    nodes = parse('c <- Conv2d({3, 3}; {1, 1}; {1, 1})')
+    assert isinstance(nodes[0].right, Conv2dNode)
+
+
+def test_relu():
+    nodes = parse('r <- ReLU({conv1})')
+    assert isinstance(nodes[0].right, ReLUNode)
+
+
+def test_batchnorm():
+    nodes = parse('bn <- BatchNorm()')
+    assert isinstance(nodes[0].right, BatchNormNode)
+
+
+def test_dropout():
+    nodes = parse('d <- Dropout(0.5)')
+    assert isinstance(nodes[0].right, DropoutNode)
+
+
+def test_multiline():
+    code = """
+    a <- Dense(60)
+    b <- Dense(10; sigmoid; {a})
+    """
+    nodes = parse(code)
+    assert len(nodes) == 2
