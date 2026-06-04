@@ -10,61 +10,51 @@ class StructureOpt:
             return layer.get("type", "")
         return ""
 
+    def _get(self, index: int) -> dict | None:
+        if 0 <= index < len(self.structure):
+            return self.structure[index]
+        return None
+
     def execute(self):
-        index = 0
         new_structure = []
+        index = 0
 
-        skip_next_layer = False
-        for item in self.structure:
-            if skip_next_layer:
-                continue
+        while index < len(self.structure):
+            t0 = self._layer_type(self._get(index))
+            t1 = self._layer_type(self._get(index + 1))
+            t2 = self._layer_type(self._get(index + 2))
 
-            current_type = self._layer_type(item)
+            C = LayerType.Conv2d.value
+            L = LayerType.Linear.value
+            BN = LayerType.BatchNorm.value
+            RL = LayerType.ReLU.value
 
-            next_item = self.structure[index + 1] if len(self.structure) > index + 1 else None
-            next_type = self._layer_type(next_item)
+            if t0 == C and t1 == BN and t2 == RL:
+                new_structure.append({"type": LayerType.Conv2d_BatchNorm_ReLU.value})
+                index += 3
 
-            new_type = None
-            if current_type == LayerType.Conv2d.value and next_type == LayerType.BatchNorm.value:
-                new_type = LayerType.Conv2d_BatchNorm.value
-                new_value = {
-                    "type": new_type
-                }
+            elif t0 == L and t1 == BN and t2 == RL:
+                new_structure.append({"type": LayerType.Linear_BatchNorm_ReLU.value})
+                index += 3
 
-                new_structure.append(new_value)
-                index += 1
-                skip_next_layer = True
-            elif current_type == LayerType.Conv2d_BatchNorm.value and next_type == LayerType.ReLU.value:
-                new_type = LayerType.C2B_ReLU.value
-                new_value = {
-                    "type": new_type
-                }
+            elif t0 == C and t1 == BN:
+                new_structure.append({"type": LayerType.Conv2d_BatchNorm.value})
+                index += 2
 
-                new_structure.append(new_value)
-                index += 1
-                skip_next_layer = True
-            elif current_type == LayerType.Linear.value and next_type == LayerType.BatchNorm.value:
-                new_type = LayerType.Linear_BarchNorm.value
-                new_value = {
-                    "type": new_type
-                }
+            elif t0 == C and t1 == RL:
+                new_structure.append({"type": LayerType.Conv2d_ReLU.value})
+                index += 2
 
-                new_structure.append(new_value)
-                index += 1
-                skip_next_layer = True
-            elif current_type == LayerType.Linear.value and next_type == LayerType.ReLU.value:
-                new_type = LayerType.Linear_ReLU.value
-                new_value = {
-                    "type": new_type
-                }
+            elif t0 == L and t1 == BN:
+                new_structure.append({"type": LayerType.Linear_BatchNorm.value})
+                index += 2
 
-                new_structure.append(new_value)
-                index += 1
-                skip_next_layer = True
+            elif t0 == L and t1 == RL:
+                new_structure.append({"type": LayerType.Linear_ReLU.value})
+                index += 2
+
             else:
-                new_structure.append(item)
-                skip_next_layer = False
-
-            index += 1
+                new_structure.append(self.structure[index])
+                index += 1
 
         return new_structure
