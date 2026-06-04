@@ -1,4 +1,4 @@
-from netopt.structure_opt.enums import LayerType
+from netopt.enums import LayerType
 
 
 class StructureOpt:

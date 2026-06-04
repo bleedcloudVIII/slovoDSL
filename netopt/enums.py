@@ -7,6 +7,7 @@ class LayerType(Enum):
     ReLU = "ReLU"
     BatchNorm = "BatchNorm"
     Linear = "Linear"
+    Dropout = "Dropout"
 
     # Fusion: Conv2d
     Conv2d_BatchNorm = "C2B"

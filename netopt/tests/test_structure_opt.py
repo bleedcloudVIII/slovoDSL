@@ -1,5 +1,5 @@
 from netopt.structure_opt.service import StructureOpt
-from netopt.structure_opt.enums import LayerType
+from netopt.enums import LayerType
 
 
 def test_conv2d_batchnorm():
