@@ -2,7 +2,7 @@ from netopt.enums import LayerType
 
 
 class StructureOpt:
-    def __init__(self, structure: dict):
+    def __init__(self, structure: list):
         self.structure = structure
 
     def _layer_type(self, layer: dict | None) -> str:
@@ -15,7 +15,7 @@ class StructureOpt:
             return self.structure[index]
         return None
 
-    def execute(self):
+    def execute(self) -> list:
         new_structure = []
         index = 0
 
@@ -23,13 +23,24 @@ class StructureOpt:
             t0 = self._layer_type(self._get(index))
             t1 = self._layer_type(self._get(index + 1))
             t2 = self._layer_type(self._get(index + 2))
+            t3 = self._layer_type(self._get(index + 3))
 
             C = LayerType.Conv2d.value
             L = LayerType.Linear.value
             BN = LayerType.BatchNorm.value
             RL = LayerType.ReLU.value
+            MP = LayerType.MaxPooling.value
+            AP = LayerType.AvgPooling.value
 
-            if t0 == C and t1 == BN and t2 == RL:
+            if t0 == C and t1 == BN and t2 == RL and t3 == MP:
+                new_structure.append({"type": LayerType.Conv2d_BatchNorm_ReLU_MaxPooling.value})
+                index += 4
+
+            elif t0 == C and t1 == BN and t2 == RL and t3 == AP:
+                new_structure.append({"type": LayerType.Conv2d_BatchNorm_ReLU_AvgPooling.value})
+                index += 4
+
+            elif t0 == C and t1 == BN and t2 == RL:
                 new_structure.append({"type": LayerType.Conv2d_BatchNorm_ReLU.value})
                 index += 3
 
