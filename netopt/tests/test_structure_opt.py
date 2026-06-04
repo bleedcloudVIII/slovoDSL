@@ -1,66 +1,66 @@
 from netopt.structure_opt.service import StructureOpt
-from netopt.structure_opt.enums import FusionLayer
+from netopt.structure_opt.enums import LayerType
 
 
 def test_conv2d_batch():
     json = [
         {
-            "type": "Con2D"
+            "type": LayerType.Conv2d.value
         },
         {
-            "type": "BatchNorm",
+            "type": LayerType.BatchNorm.value,
         }
     ]
 
     result = StructureOpt(json).execute()
 
     assert len(result) == 1
-    assert result[0].get("type", "") == FusionLayer.Conv2d_BatchNorm.value
+    assert result[0].get("type", "") == LayerType.Conv2d_BatchNorm.value
 
 
 def test_conv2dbatch_relu():
     json = [
         {
-            "type": "Con2D_BarchNorm"
+            "type": LayerType.Conv2d_BatchNorm.value
         },
         {
-            "type": "ReLU",
+            "type": LayerType.ReLU.value,
         }
     ]
 
     result = StructureOpt(json).execute()
 
     assert len(result) == 1
-    assert result[0].get("type", "") == FusionLayer.C2B_ReLU.value
+    assert result[0].get("type", "") == LayerType.C2B_ReLU.value
 
 
 def test_linear_batch():
     json = [
         {
-            "type": "Linear"
+            "type": LayerType.Linear.value
         },
         {
-            "type": "BatchNorm",
+            "type": LayerType.BatchNorm.value,
         }
     ]
 
     result = StructureOpt(json).execute()
 
     assert len(result) == 1
-    assert result[0].get("type", "") == FusionLayer.Linear_BarchNorm.value
+    assert result[0].get("type", "") == LayerType.Linear_BarchNorm.value
 
 
 def test_linear_relu():
     json = [
         {
-            "type": "Linear"
+            "type": LayerType.Linear.value
         },
         {
-            "type": "ReLU",
+            "type": LayerType.ReLU.value,
         }
     ]
 
     result = StructureOpt(json).execute()
 
     assert len(result) == 1
-    assert result[0].get("type", "") == FusionLayer.Linear_ReLU.value
+    assert result[0].get("type", "") == LayerType.Linear_ReLU.value
