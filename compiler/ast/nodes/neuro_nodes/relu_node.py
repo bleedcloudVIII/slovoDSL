@@ -8,7 +8,7 @@ from netopt.enums import LayerType
 class ReLUNode(Node):
     def __init__(
         self,
-        dependencies: Optional[ListNode] = []
+        dependencies: Optional[ListNode] = None
     ):
         self.dependencies = dependencies
 
@@ -24,5 +24,5 @@ class ReLUNode(Node):
     def to_dict(self) -> dict:
         return {
             "type": LayerType.ReLU.value,
-            "dependencies": [d.execute() for d in self.dependencies.expressions]
+            "dependencies": [d.execute() for d in self.dependencies.expressions] if self.dependencies else []
         }

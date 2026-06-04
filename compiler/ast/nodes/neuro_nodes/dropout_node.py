@@ -10,7 +10,7 @@ class DropoutNode(Node):
     def __init__(
         self,
         p: Optional[NumberNode] = None,
-        dependencies: Optional[ListNode] = []
+        dependencies: Optional[ListNode] = None
     ):
         self.p = p
         self.dependencies = dependencies
@@ -28,7 +28,7 @@ class DropoutNode(Node):
         return {
             "type": LayerType.Dropout.value,
             "params": {
-                "p": self.p.value if self.p else 0.5,
+                "p": self.p.execute() if self.p else 0.5,
             },
-            "dependencies": [d.execute() for d in self.dependencies.expressions]
+            "dependencies": [d.execute() for d in self.dependencies.expressions] if self.dependencies else []
         }

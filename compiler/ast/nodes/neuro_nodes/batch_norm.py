@@ -11,7 +11,7 @@ class BatchNormNode(Node):
         self,
         eps: Optional[NumberNode] = None,
         momentum: Optional[NumberNode] = None,
-        dependencies: Optional[ListNode] = []
+        dependencies: Optional[ListNode] = None
     ):
         self.eps = eps
         self.momentum = momentum
@@ -29,7 +29,7 @@ class BatchNormNode(Node):
     def to_dict(self) -> dict:
         return {
             "type": LayerType.BatchNorm.value,
-            "eps": self.eps.value if self.eps else 1e-5,
-            "momentum": self.momentum.value if self.momentum else 0.1,
-            "dependencies": [d.execute() for d in self.dependencies.expressions]
+            "eps": self.eps.execute() if self.eps else 1e-5,
+            "momentum": self.momentum.execute() if self.momentum else 0.1,
+            "dependencies": [d.execute() for d in self.dependencies.expressions] if self.dependencies else []
         }

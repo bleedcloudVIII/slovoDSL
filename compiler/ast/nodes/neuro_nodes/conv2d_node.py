@@ -13,7 +13,7 @@ class Conv2dNode(Node):
         offset: Optional[ListNode | WordNode] = None,
         padding: Optional[ListNode | WordNode] = None,
         stride: Optional[ListNode | WordNode] = None,
-        dependencies: Optional[ListNode] = []
+        dependencies: Optional[ListNode] = None
     ):
         self.kernel_size = kernel_size
         self.offset = offset
@@ -33,9 +33,9 @@ class Conv2dNode(Node):
     def to_dict(self) -> dict:
         return {
             "type": LayerType.Conv2d.value,
-            "kernel_size": self.kernel_size.value if self.kernel_size else [1, 1],
-            "offset": self.offset.value if self.offset else [0, 0],
-            "padding": self.padding.value if self.padding else [0, 0],
-            "stride": self.stride.value if self.stride else [1, 1],
-            "dependencies": [d.execute() for d in self.dependencies.expressions]
+            "kernel_size": self.kernel_size.execute() if self.kernel_size else [1, 1],
+            "offset": self.offset.execute() if self.offset else [0, 0],
+            "padding": self.padding.execute() if self.padding else [0, 0],
+            "stride": self.stride.execute() if self.stride else [1, 1],
+            "dependencies": [d.execute() for d in self.dependencies.expressions] if self.dependencies else []
         }
