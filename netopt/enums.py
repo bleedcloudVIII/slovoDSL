@@ -10,6 +10,8 @@ class LayerType(Enum):
     Dropout = "Dropout"
     MaxPooling = "MaxPooling"
     AvgPooling = "AvgPooling"
+    Add = "Add"
+    Concat = "Concat"
 
     # Fusion
     Conv2d_MaxPooling = "C2MP"

@@ -1,6 +1,8 @@
 from enum import Enum
 # from compiler.ast.nodes.neuro_nodes.layer_node import LayerNode
+from compiler.ast.nodes.neuro_nodes.add_node import AddNode
 from compiler.ast.nodes.neuro_nodes.batch_norm import BatchNormNode
+from compiler.ast.nodes.neuro_nodes.concat_node import ConcatNode
 from compiler.ast.nodes.neuro_nodes.dropout_node import DropoutNode
 from compiler.ast.nodes.neuro_nodes.relu_node import ReLUNode
 from compiler.ast.nodes.node import Node
@@ -18,9 +20,8 @@ class KeyWord(Enum):
     BATCH_NORM = ("BatchNorm", BatchNormNode)
     DROPOUT = ("Dropout", DropoutNode)
     RELU = ("ReLU", ReLUNode)
-    # LAYER = ("layer", LayerNode)
-    # Пока такого нет
-    pass
+    ADD = ("Add", AddNode)
+    CONCAT = ("Concat", ConcatNode)
 
 
 def get_node_by_word(text: str) -> Node:

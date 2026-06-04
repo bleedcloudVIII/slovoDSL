@@ -137,3 +137,35 @@ def test_mixed_structure():
 def test_empty_structure():
     result = StructureOpt([]).execute()
     assert result == []
+
+
+def test_add_breaks_fusion():
+    data = [
+        {"type": LayerType.Conv2d.value},
+        {"type": LayerType.Add.value},
+        {"type": LayerType.BatchNorm.value},
+        {"type": LayerType.ReLU.value},
+    ]
+    result = StructureOpt(data).execute()
+
+    assert len(result) == 4
+    assert result[0]["type"] == LayerType.Conv2d.value
+    assert result[1]["type"] == LayerType.Add.value
+    assert result[2]["type"] == LayerType.BatchNorm.value
+    assert result[3]["type"] == LayerType.ReLU.value
+
+
+def test_concat_breaks_fusion():
+    data = [
+        {"type": LayerType.Conv2d.value},
+        {"type": LayerType.Concat.value},
+        {"type": LayerType.BatchNorm.value},
+        {"type": LayerType.ReLU.value},
+    ]
+    result = StructureOpt(data).execute()
+
+    assert len(result) == 4
+    assert result[0]["type"] == LayerType.Conv2d.value
+    assert result[1]["type"] == LayerType.Concat.value
+    assert result[2]["type"] == LayerType.BatchNorm.value
+    assert result[3]["type"] == LayerType.ReLU.value
