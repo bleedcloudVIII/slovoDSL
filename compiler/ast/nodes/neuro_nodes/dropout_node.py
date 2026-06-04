@@ -30,5 +30,5 @@ class DropoutNode(Node):
             "params": {
                 "p": self.p.execute() if self.p else 0.5,
             },
-            "dependencies": [d.execute() for d in self.dependencies.expressions] if self.dependencies else []
+            "dependencies": [d.token.token_text for d in self.dependencies.expressions] if self.dependencies else []
         }

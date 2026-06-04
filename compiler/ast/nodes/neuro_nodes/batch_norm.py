@@ -31,5 +31,5 @@ class BatchNormNode(Node):
             "type": LayerType.BatchNorm.value,
             "eps": self.eps.execute() if self.eps else 1e-5,
             "momentum": self.momentum.execute() if self.momentum else 0.1,
-            "dependencies": [d.execute() for d in self.dependencies.expressions] if self.dependencies else []
+            "dependencies": [d.token.token_text for d in self.dependencies.expressions] if self.dependencies else []
         }

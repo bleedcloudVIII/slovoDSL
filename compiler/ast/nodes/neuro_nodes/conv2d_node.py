@@ -37,5 +37,5 @@ class Conv2dNode(Node):
             "offset": self.offset.execute() if self.offset else [0, 0],
             "padding": self.padding.execute() if self.padding else [0, 0],
             "stride": self.stride.execute() if self.stride else [1, 1],
-            "dependencies": [d.execute() for d in self.dependencies.expressions] if self.dependencies else []
+            "dependencies": [d.token.token_text for d in self.dependencies.expressions] if self.dependencies else []
         }

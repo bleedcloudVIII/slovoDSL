@@ -33,5 +33,5 @@ class ConcatNode(Node):
         return {
             "type": LayerType.Concat.value,
             "axis": self.axis.execute() if self.axis else 1,
-            "dependencies": [d.execute() for d in self.dependencies.expressions] if self.dependencies else []
+            "dependencies": [d.token.token_text for d in self.dependencies.expressions] if self.dependencies else []
         }

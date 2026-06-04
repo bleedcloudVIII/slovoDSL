@@ -31,6 +31,6 @@ class DenseNode(Node):
         return {
             "type": LayerType.Linear.value,
             "input_size": self.input_size.execute() if self.input_size else None,
-            "value": self.value.execute() if self.value else None,
-            "dependencies": [d.execute() for d in self.dependencies.expressions] if self.dependencies else []
+            "value": self.value.token.token_text if self.value else None,
+            "dependencies": [d.token.token_text for d in self.dependencies.expressions] if self.dependencies else []
         }

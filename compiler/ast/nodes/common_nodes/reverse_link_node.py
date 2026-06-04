@@ -24,3 +24,8 @@ class ReverseLinkNode(Node):
 
     def __repr__(self):
         return f"ReverseLinkNode<{self.left}, {self.right}>"
+
+    def to_dict(self) -> dict:
+        result = self.right.to_dict()
+        result["name"] = self.left.token.token_text
+        return result

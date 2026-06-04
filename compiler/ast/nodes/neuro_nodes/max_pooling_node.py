@@ -30,6 +30,6 @@ class MaxPoolingNode(Node):
         return {
             "type": LayerType.MaxPooling.value,
             "pool_size": self.pool_size.execute() if self.pool_size else 2,
-            "stride": self.stride.execute() if self.stride else self.pool_size.execute(),
-            "dependencies": [d.execute() for d in self.dependencies.expressions] if self.dependencies else []
+            "stride": self.stride.execute() if self.stride else 2,
+            "dependencies": [d.token.token_text for d in self.dependencies.expressions] if self.dependencies else []
         }

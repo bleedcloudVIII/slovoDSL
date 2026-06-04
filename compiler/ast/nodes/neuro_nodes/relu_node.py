@@ -24,5 +24,5 @@ class ReLUNode(Node):
     def to_dict(self) -> dict:
         return {
             "type": LayerType.ReLU.value,
-            "dependencies": [d.execute() for d in self.dependencies.expressions] if self.dependencies else []
+            "dependencies": [d.token.token_text for d in self.dependencies.expressions] if self.dependencies else []
         }
