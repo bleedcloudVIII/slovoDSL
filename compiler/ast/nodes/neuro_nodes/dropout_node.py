@@ -1,36 +1,34 @@
 from compiler.ast.nodes.node import Node
 from compiler.ast.nodes.common_nodes.number_node import NumberNode
-from compiler.ast.nodes.common_nodes.word_node import WordNode
 from compiler.ast.nodes.common_nodes.list_node import ListNode
 from typing import Optional
 
 from netopt.enums import LayerType
 
 
-class DenseNode(Node):
+class DropoutNode(Node):
     def __init__(
         self,
-        input_size: Optional[NumberNode] = None,
-        value: Optional[WordNode | ListNode] = None,
+        p: Optional[NumberNode] = None,
         dependencies: Optional[ListNode] = []
     ):
-        self.input_size = input_size
-        self.value = value
+        self.p = p
         self.dependencies = dependencies
 
     def execute(self):
         return None
 
     def __str__(self):
-        return f"DenseNode<{self.input_size}, {self.value}>"
+        return f"DropoutNode<{self.p}>"
 
     def __repr__(self):
-        return f"DenseNode<{self.input_size}, {self.value}>"
+        return f"DropoutNode<{self.p}>"
 
     def to_dict(self) -> dict:
         return {
-            "type": LayerType.Linear.value,
-            "input_size": self.input_size.value if self.input_size else None,
-            "value": self.value.value if self.value else None,
+            "type": LayerType.Dropout.value,
+            "params": {
+                "p": self.p.value if self.p else 0.5,
+            },
             "dependencies": [d.execute() for d in self.dependencies.expressions]
         }

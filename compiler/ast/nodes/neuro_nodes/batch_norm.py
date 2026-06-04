@@ -1,36 +1,35 @@
 from compiler.ast.nodes.node import Node
 from compiler.ast.nodes.common_nodes.number_node import NumberNode
-from compiler.ast.nodes.common_nodes.word_node import WordNode
 from compiler.ast.nodes.common_nodes.list_node import ListNode
 from typing import Optional
 
 from netopt.enums import LayerType
 
 
-class DenseNode(Node):
+class BatchNormNode(Node):
     def __init__(
         self,
-        input_size: Optional[NumberNode] = None,
-        value: Optional[WordNode | ListNode] = None,
+        eps: Optional[NumberNode] = None,
+        momentum: Optional[NumberNode] = None,
         dependencies: Optional[ListNode] = []
     ):
-        self.input_size = input_size
-        self.value = value
+        self.eps = eps
+        self.momentum = momentum
         self.dependencies = dependencies
 
     def execute(self):
         return None
 
     def __str__(self):
-        return f"DenseNode<{self.input_size}, {self.value}>"
+        return f"BatchNormNode<{self.eps}, {self.momentum}>"
 
     def __repr__(self):
-        return f"DenseNode<{self.input_size}, {self.value}>"
+        return f"BatchNormNode<{self.eps}, {self.momentum}>"
 
     def to_dict(self) -> dict:
         return {
-            "type": LayerType.Linear.value,
-            "input_size": self.input_size.value if self.input_size else None,
-            "value": self.value.value if self.value else None,
+            "type": LayerType.BatchNorm.value,
+            "eps": self.eps.value if self.eps else 1e-5,
+            "momentum": self.momentum.value if self.momentum else 0.1,
             "dependencies": [d.execute() for d in self.dependencies.expressions]
         }

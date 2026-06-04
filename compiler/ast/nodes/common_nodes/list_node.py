@@ -4,7 +4,7 @@ from compiler.ast.nodes.node import Node
 class ListNode(Node):
     def __init__(self, expressions: list[Node]):
         if not isinstance(expressions, list):
-            raise Exception("AssignNode: expression is not Node")
+            raise Exception("ListNode: expression is not Node")
 
         self.expressions = expressions
 

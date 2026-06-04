@@ -23,14 +23,29 @@ space <- "c.txt"
 
 #### Обычный скрытые слои
 
-##### Dense
+##### Dense (полносвязный слой)
 ```
 Dense(input_size; function | bias)
 ```
 
+##### Примеры
+
 ```
 Dense(50; bias)
 ```
+
+```
+Dense(70)
+```
+
+```
+Dense(7; sigmoid; {basis_1, start})
+```
+
+```
+Dense(10; cos; {hidden})
+```
+
 
 ##### Другие примеры:
 ```
@@ -53,14 +68,66 @@ end <- Dense(10; cos; {hidden})
 bias_1 <- Dense(5; {10, 20, 30, 50, 60})
 ```
 
-### Свёрточные слои
+#### Conv2d (свёрточный слой)
 ```
-Conv2d(kernel_size; offset; padding)
+Conv2d(kernel_size; offset; padding; stride)
 ```
 
 ```
-Conv2d({3, 3}; {1, 1}; {1; 2; 0})
+Conv2d({3, 3})
 ```
+
+```
+Conv2d({3, 3}; {1, 1}; {1, 1})
+```
+
+```
+Conv2d({3, 3}; {1, 1}; {1, 1}; {2, 2})
+```
+
+#### BatchNorm (батч-нормализация)
+```
+BatchNorm(eps; momentum; dependencies)
+```
+
+```
+BatchNorm()
+```
+
+```
+BatchNorm(1e-5)
+```
+
+```
+BatchNorm(1e-5; 0.1)
+```
+
+#### Dropout(p)
+```
+Dropout(p, dependencies)
+```
+
+```
+Dropout()
+```
+
+```
+Dropout(0.5)
+```
+
+```
+Dropout(0.0)
+```
+
+#### ReLU (функция активации)
+```
+ReLU(dependencies)
+```
+
+```
+ReLU({layers_1})
+```
+
 
 ### Зависимость слоя от другого
 

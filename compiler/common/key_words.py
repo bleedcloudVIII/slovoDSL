@@ -1,5 +1,8 @@
 from enum import Enum
 # from compiler.ast.nodes.neuro_nodes.layer_node import LayerNode
+from compiler.ast.nodes.neuro_nodes.batch_norm import BatchNormNode
+from compiler.ast.nodes.neuro_nodes.dropout_node import DropoutNode
+from compiler.ast.nodes.neuro_nodes.relu_node import ReLUNode
 from compiler.ast.nodes.node import Node
 from compiler.ast.nodes.neuro_nodes.dense_node import DenseNode
 from compiler.ast.nodes.neuro_nodes.conv2d_node import Conv2dNode
@@ -12,6 +15,9 @@ class KeyWord(Enum):
     CONV2D = ("Conv2d", Conv2dNode)
     MAX_POOLING = ("MaxPooling", MaxPoolingNode)
     AVG_POOLING = ("AvgPooling", AvgPoolingNode)
+    BATCH_NORM = ("BatchNorm", BatchNormNode)
+    DROPOUT = ("Dropout", DropoutNode)
+    RELU = ("ReLU", ReLUNode)
     # LAYER = ("layer", LayerNode)
     # Пока такого нет
     pass
