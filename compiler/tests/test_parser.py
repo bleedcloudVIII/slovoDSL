@@ -115,7 +115,7 @@ def test_empty_dense_layer():
     assert isinstance(result, DenseNode)
     assert result.input_size is None
     assert result.value is None
-    assert result.dependencies is None
+    assert result.dependency is None
 
 
 def test_dense_layer_with_neurons():
@@ -131,7 +131,7 @@ def test_dense_layer_with_neurons():
     assert isinstance(result.input_size, NumberNode)
     assert result.input_size.token == tokens[2]
     assert result.value is None
-    assert result.dependencies is None
+    assert result.dependency is None
 
 
 def test_dense_layer_with_neurons_and_func():
@@ -164,8 +164,8 @@ def test_dense_layer_full():
     assert result.input_size.token == tokens[2]
     assert isinstance(result.value, WordNode)
     assert result.value.token == tokens[4]
-    assert isinstance(result.dependencies, WordNode)
-    assert result.dependencies.token == tokens[6]
+    assert isinstance(result.dependency, WordNode)
+    assert result.dependency.token == tokens[6]
 
 
 def test_list_node_1():
@@ -445,11 +445,12 @@ def test_dense_with_activation():
     assert nodes[0].right.value is not None
 
 
-def test_dense_with_dependencies():
-    nodes = parse('c <- Dense(7; sigmoid; {a, b})')
+def test_dense_with_dependency():
+    nodes = parse('c <- Dense(7; sigmoid; dep_1)')
     dense = nodes[0].right
     assert isinstance(dense, DenseNode)
-    assert dense.dependencies is not None
+    assert dense.dependency is not None
+    assert dense.dependency.token.token_text == "dep_1"
 
 
 def test_conv2d_simple():

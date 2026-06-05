@@ -5,6 +5,8 @@ from compiler.ast.nodes.common_nodes.number_node import NumberNode
 from compiler.ast.nodes.common_nodes.list_node import ListNode
 from typing import Optional
 
+from compiler.common.token import Token
+from compiler.common.token_type import TokenType
 from netopt.enums import LayerType
 
 
@@ -15,7 +17,7 @@ class ConcatAxisType(Enum):
     WIDTH = 3
 
 
-DEFAULT_AXIS = ConcatAxisType.FEATURES_CHANNELS
+DEFAULT_AXIS = NumberNode(Token(token_text=str(ConcatAxisType.FEATURES_CHANNELS.value), token_type=TokenType.NUMBER))
 
 
 class ConcatNode(Node):

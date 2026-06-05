@@ -30,7 +30,7 @@ def test_add_to_dict():
 def test_concat_default_axis():
     nodes = parse('c <- Concat({A, B})')
     assert isinstance(nodes[0].right, ConcatNode)
-    assert nodes[0].right.axis is None
+    assert nodes[0].right.axis.execute() == 1
     result = nodes[0].right.to_dict()
     assert result["axis"] == 1
 
