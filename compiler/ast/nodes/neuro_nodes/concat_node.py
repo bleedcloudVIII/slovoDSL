@@ -1,9 +1,21 @@
+from enum import Enum
+
 from compiler.ast.nodes.node import Node
 from compiler.ast.nodes.common_nodes.number_node import NumberNode
 from compiler.ast.nodes.common_nodes.list_node import ListNode
 from typing import Optional
 
 from netopt.enums import LayerType
+
+
+class ConcatAxisType(Enum):
+    BATCH = 0
+    FEATURES_CHANNELS = 1
+    HEIGHT = 2
+    WIDTH = 3
+
+
+DEFAULT_AXIS = ConcatAxisType.FEATURES_CHANNELS
 
 
 class ConcatNode(Node):
@@ -13,12 +25,11 @@ class ConcatNode(Node):
         axis: Optional[NumberNode] = None
     ):
         self.dependencies = dependencies
-        self.axis = axis
 
-# axis=0 — по batch
-# axis=1 — по features/channels  ← чаще всего
-# axis=2 — по высоте (для 2D)
-# axis=3 — по ширине (для 2D)
+        if axis is None:
+            axis = DEFAULT_AXIS
+
+        self.axis = axis
 
     def execute(self):
         return None

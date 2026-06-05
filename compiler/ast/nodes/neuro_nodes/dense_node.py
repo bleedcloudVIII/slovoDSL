@@ -12,11 +12,11 @@ class DenseNode(Node):
         self,
         input_size: Optional[NumberNode] = None,
         value: Optional[WordNode | ListNode] = None,
-        dependencies: Optional[ListNode] = None
+        dependency: Optional[WordNode] = None
     ):
         self.input_size = input_size
         self.value = value
-        self.dependencies = dependencies
+        self.dependency = dependency
 
     def execute(self):
         return None
@@ -32,5 +32,5 @@ class DenseNode(Node):
             "type": LayerType.Linear.value,
             "input_size": self.input_size.execute() if self.input_size else None,
             "value": self.value.token.token_text if self.value else None,
-            "dependencies": [d.token.token_text for d in self.dependencies.expressions] if self.dependencies else []
+            "dependency": self.dependency.token.token_text if self.dependency else None
         }

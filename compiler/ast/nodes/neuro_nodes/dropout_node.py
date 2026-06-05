@@ -1,6 +1,6 @@
+from compiler.ast.nodes.common_nodes.word_node import WordNode
 from compiler.ast.nodes.node import Node
 from compiler.ast.nodes.common_nodes.number_node import NumberNode
-from compiler.ast.nodes.common_nodes.list_node import ListNode
 from typing import Optional
 
 from netopt.enums import LayerType
@@ -10,10 +10,10 @@ class DropoutNode(Node):
     def __init__(
         self,
         p: Optional[NumberNode] = None,
-        dependencies: Optional[ListNode] = None
+        dependency: Optional[WordNode] = None
     ):
         self.p = p
-        self.dependencies = dependencies
+        self.dependency = dependency
 
     def execute(self):
         return None
@@ -30,5 +30,5 @@ class DropoutNode(Node):
             "params": {
                 "p": self.p.execute() if self.p else 0.5,
             },
-            "dependencies": [d.token.token_text for d in self.dependencies.expressions] if self.dependencies else []
+            "dependency": self.dependency.token.token_text if self.dependency else None
         }

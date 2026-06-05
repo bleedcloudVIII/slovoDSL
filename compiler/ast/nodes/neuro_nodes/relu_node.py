@@ -1,5 +1,5 @@
+from compiler.ast.nodes.common_nodes.word_node import WordNode
 from compiler.ast.nodes.node import Node
-from compiler.ast.nodes.common_nodes.list_node import ListNode
 from typing import Optional
 
 from netopt.enums import LayerType
@@ -8,9 +8,9 @@ from netopt.enums import LayerType
 class ReLUNode(Node):
     def __init__(
         self,
-        dependencies: Optional[ListNode] = None
+        dependency: Optional[WordNode] = None
     ):
-        self.dependencies = dependencies
+        self.dependency = dependency
 
     def execute(self):
         return None
@@ -24,5 +24,5 @@ class ReLUNode(Node):
     def to_dict(self) -> dict:
         return {
             "type": LayerType.ReLU.value,
-            "dependencies": [d.token.token_text for d in self.dependencies.expressions] if self.dependencies else []
+            "dependency": self.dependency.token.token_text if self.dependency else None
         }

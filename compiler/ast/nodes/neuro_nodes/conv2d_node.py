@@ -13,13 +13,13 @@ class Conv2dNode(Node):
         offset: Optional[ListNode | WordNode] = None,
         padding: Optional[ListNode | WordNode] = None,
         stride: Optional[ListNode | WordNode] = None,
-        dependencies: Optional[ListNode] = None
+        dependency: Optional[WordNode] = None
     ):
         self.kernel_size = kernel_size
         self.offset = offset
         self.padding = padding
         self.stride = stride
-        self.dependencies = dependencies
+        self.dependency = dependency
 
     def execute(self):
         return None
@@ -37,5 +37,5 @@ class Conv2dNode(Node):
             "offset": self.offset.execute() if self.offset else [0, 0],
             "padding": self.padding.execute() if self.padding else [0, 0],
             "stride": self.stride.execute() if self.stride else [1, 1],
-            "dependencies": [d.token.token_text for d in self.dependencies.expressions] if self.dependencies else []
+            "dependency": self.dependency.token.token_text if self.dependency else None
         }
