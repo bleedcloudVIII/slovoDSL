@@ -56,7 +56,7 @@ def test_add_in_network():
     B <- Dense(5; sigmoid; {A})
     C <- Add({A, B})
     D <- Dense(10; relu; {C})
-    """ 
+    """
     nodes = parse(code)
     assert len(nodes) == 4
     assert isinstance(nodes[2].right, AddNode)

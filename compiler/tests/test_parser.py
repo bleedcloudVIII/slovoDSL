@@ -425,7 +425,7 @@ def test_avg_pooling_str_repr():
 
     assert "AvgPoolingNode" in str(node)
     assert "4" in str(node)
-    
+
 
 def parse(code: str):
     tokens = Lexer(code).lexer_analysis()

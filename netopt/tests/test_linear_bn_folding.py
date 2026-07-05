@@ -4,64 +4,62 @@ from netopt.norm_folding.norm_folding import NormFolding
 from netopt.enums import LayerType
 
 
-def make_weights(out_ch=4, in_ch=3, kH=3, kW=3):
+def make_linear_weights(out_size=4, in_size=8):
     return {
-        "conv1": {
-            "weight": np.ones((out_ch, in_ch, kH, kW)),
-            "bias": np.zeros(out_ch)
+        "fc1": {
+            "weight": np.ones((out_size, in_size)),
+            "bias": np.zeros(out_size)
         },
         "bn1": {
-            "gamma": np.ones(out_ch),
-            "beta": np.zeros(out_ch),
-            "running_mean": np.zeros(out_ch),
-            "running_var": np.ones(out_ch),
+            "gamma": np.ones(out_size),
+            "beta": np.zeros(out_size),
+            "running_mean": np.zeros(out_size),
+            "running_var": np.ones(out_size),
             "eps": 1e-5
         }
     }
 
 
-def test_bn_folding_removes_bn():
+def test_linear_bn_folding_removes_bn():
     structure = [
-        {"name": "conv1", "type": LayerType.Conv2d.value},
+        {"name": "fc1",   "type": LayerType.Linear.value},
         {"name": "bn1",   "type": LayerType.BatchNorm.value},
         {"name": "relu1", "type": LayerType.ReLU.value},
     ]
-    weights = make_weights()
+    weights = make_linear_weights()
 
     new_structure, new_weights = NormFolding(structure, weights).execute()
 
     assert len(new_structure) == 2
-    assert new_structure[0]["type"] == LayerType.Conv2d.value
+    assert new_structure[0]["type"] == LayerType.Linear.value
     assert new_structure[1]["type"] == LayerType.ReLU.value
     assert "bn1" not in new_weights
 
 
-def test_bn_folding_updates_weights():
+def test_linear_bn_folding_updates_weights():
     structure = [
-        {"name": "conv1", "type": LayerType.Conv2d.value},
-        {"name": "bn1",   "type": LayerType.BatchNorm.value},
+        {"name": "fc1", "type": LayerType.Linear.value},
+        {"name": "bn1", "type": LayerType.BatchNorm.value},
     ]
-    weights = make_weights(out_ch=4)
+    weights = make_linear_weights(out_size=4, in_size=8)
 
     _, new_weights = NormFolding(structure, weights).execute()
 
-    # gamma=1, mean=0, var=1, eps=1e-5 → scale ≈ 1
-    # W' = W * 1 ≈ W
-    assert new_weights["conv1"]["weight"].shape == (4, 3, 3, 3)
-    assert new_weights["conv1"]["bias"].shape == (4,)
+    assert new_weights["fc1"]["weight"].shape == (4, 8)
+    assert new_weights["fc1"]["bias"].shape == (4,)
 
 
-def test_bn_folding_correct_math():
+def test_linear_bn_folding_correct_math():
     structure = [
-        {"name": "conv1", "type": LayerType.Conv2d.value},
-        {"name": "bn1",   "type": LayerType.BatchNorm.value},
+        {"name": "fc1", "type": LayerType.Linear.value},
+        {"name": "bn1", "type": LayerType.BatchNorm.value},
     ]
 
-    out_ch = 2
+    out_size = 2
     weights = {
-        "conv1": {
-            "weight": np.ones((out_ch, 1, 1, 1)),
-            "bias": np.zeros(out_ch)
+        "fc1": {
+            "weight": np.ones((out_size, 3)),
+            "bias": np.zeros(out_size)
         },
         "bn1": {
             "gamma": np.array([2.0, 4.0]),
@@ -74,34 +72,21 @@ def test_bn_folding_correct_math():
 
     _, new_weights = NormFolding(structure, weights).execute()
 
-    # scale = gamma / sqrt(var) = [2, 4]
-    # W' = W * scale = [2, 4]
+    # scale = [2, 4]
+    # W' = W * scale[:, None] = [[2,2,2], [4,4,4]]
     # b' = scale * (0 - 0) + beta = [1, 2]
-    expected_weight = np.array([2.0, 4.0])
+    expected_weight = np.array([[2.0, 2.0, 2.0], [4.0, 4.0, 4.0]])
     expected_bias = np.array([1.0, 2.0])
 
-    assert np.allclose(new_weights["conv1"]["weight"].flatten()[:2], expected_weight)
-    assert np.allclose(new_weights["conv1"]["bias"], expected_bias)
+    assert np.allclose(new_weights["fc1"]["weight"], expected_weight)
+    assert np.allclose(new_weights["fc1"]["bias"], expected_bias)
 
 
-def test_bn_folding_no_bn():
-    structure = [
-        {"name": "conv1", "type": LayerType.Conv2d.value},
-        {"name": "relu1", "type": LayerType.ReLU.value},
-    ]
-    weights = make_weights()
-
-    new_structure, new_weights = NormFolding(structure, weights).execute()
-
-    assert len(new_structure) == 2
-    assert "bn1" in new_weights
-
-
-def test_bn_folding_multiple_blocks():
+def test_mixed_conv_linear_folding():
     structure = [
         {"name": "conv1", "type": LayerType.Conv2d.value},
         {"name": "bn1",   "type": LayerType.BatchNorm.value},
-        {"name": "conv2", "type": LayerType.Conv2d.value},
+        {"name": "fc1",   "type": LayerType.Linear.value},
         {"name": "bn2",   "type": LayerType.BatchNorm.value},
     ]
     weights = {
@@ -113,8 +98,8 @@ def test_bn_folding_multiple_blocks():
             "running_var": np.ones(4),
             "eps": 1e-5
         },
-        "conv2": {
-            "weight": np.ones((8, 4, 3, 3)),
+        "fc1":   {
+            "weight": np.ones((8, 4)),
             "bias": np.zeros(8)
         },
         "bn2":   {
@@ -123,7 +108,7 @@ def test_bn_folding_multiple_blocks():
             "running_mean": np.zeros(8),
             "running_var": np.ones(8),
             "eps": 1e-5
-        },
+        }
     }
 
     new_structure, new_weights = NormFolding(structure, weights).execute()
@@ -132,4 +117,4 @@ def test_bn_folding_multiple_blocks():
     assert "bn1" not in new_weights
     assert "bn2" not in new_weights
     assert "conv1" in new_weights
-    assert "conv2" in new_weights
+    assert "fc1" in new_weights

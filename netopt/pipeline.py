@@ -1,25 +1,30 @@
-# structure_opt/pipeline.py
-from netopt.bn_folding.bn_folding import BNFolding
-from netopt.bn_folding.weight_loader import WeightLoader
-from netopt.structure_opt.service import StructureOpt
 from netopt.identity_opt.service import IdentityOpt
+from netopt.norm_folding.norm_folding import NormFolding
+from netopt.norm_folding.weight_loader import WeightLoader
+from netopt.pruning.weight_pruning import WeightPruning
+from netopt.structure_opt.service import StructureOpt
 
 
 class OptimizationPipeline:
-    def __init__(self, structure: list):
+    def __init__(self, structure: list, weights_path: str = None, pruning_threshold: float = None):
         self.structure = structure
+        self.weights_path = weights_path
+        self.pruning_threshold = pruning_threshold
 
-    def execute(self) -> list:
-        # Этап 1 — удаляем Identity слои
+    def execute(self) -> tuple[list, dict, dict]:
         structure = IdentityOpt(self.structure).execute()
 
-        # Этап 2 — весовые оптимизации (до fusion!)
         weights = {}
+        pruning_report = {}
         if self.weights_path:
             weights = WeightLoader(self.weights_path).load()
-            structure, weights = BNFolding(structure, weights).execute()
+            structure, weights = NormFolding(structure, weights).execute()
 
-        # Этап 3 — структурные оптимизации (после BN Folding)
+            if self.pruning_threshold is not None:
+                structure, weights, pruning_report = WeightPruning(
+                    structure, weights, self.pruning_threshold
+                ).execute()
+
         structure = StructureOpt(structure).execute()
 
-        return structure, weights
+        return structure, weights, pruning_report
