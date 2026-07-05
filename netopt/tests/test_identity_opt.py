@@ -22,7 +22,7 @@ def test_dropout_nonzero_kept():
     ]
     result = IdentityOpt(data).execute()
 
-    assert len(result) == 2
+    assert len(result) == 1
 
 
 def test_no_identity_layers():

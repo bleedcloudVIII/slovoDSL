@@ -2,6 +2,7 @@ from netopt.enums import LayerType
 
 
 class IdentityOpt:
+    """ Оптимизацтор тождественных слоёв, то есть удаление слоёв, которые не оказывают влияния на результат работы модели. """
     def __init__(self, structure: list):
         self.structure = structure
 
@@ -9,7 +10,7 @@ class IdentityOpt:
         layer_type = layer.get("type", "")
 
         if layer_type == LayerType.Dropout.value:
-            return layer.get("params", {}).get("p", 1.0) == 0.0
+            return True
 
         return False
 

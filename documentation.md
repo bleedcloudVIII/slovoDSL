@@ -91,24 +91,12 @@ BatchNorm(eps; momentum; dependencies)
 ```
 
 ```
-BatchNorm()
-```
-
-```
-BatchNorm(1e-5)
-```
-
-```
 BatchNorm(1e-5; 0.1)
 ```
 
 #### Dropout(p)
 ```
 Dropout(p, dependencies)
-```
-
-```
-Dropout()
 ```
 
 ```

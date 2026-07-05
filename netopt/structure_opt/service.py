@@ -2,6 +2,7 @@ from netopt.enums import LayerType
 
 
 class StructureOpt:
+    """ Оптимизатор структуры модели, то есть объединение слоёв в более сложные слои, которые оказывают влияние на результат работы модели. """ 
     def __init__(self, structure: list):
         self.structure = structure
 
@@ -48,12 +49,28 @@ class StructureOpt:
                 new_structure.append({"type": LayerType.Linear_BatchNorm_ReLU.value})
                 index += 3
 
+            elif t0 == C and t1 == RL and t2 == MP:
+                new_structure.append({"type": LayerType.Conv2d_ReLU_MaxPooling.value})
+                index += 3
+
+            elif t0 == C and t1 == RL and t2 == AP:
+                new_structure.append({"type": LayerType.Conv2d_ReLU_AvgPooling.value})
+                index += 3
+
             elif t0 == C and t1 == BN:
                 new_structure.append({"type": LayerType.Conv2d_BatchNorm.value})
                 index += 2
 
             elif t0 == C and t1 == RL:
                 new_structure.append({"type": LayerType.Conv2d_ReLU.value})
+                index += 2
+
+            elif t0 == C and t1 == MP:
+                new_structure.append({"type": LayerType.Conv2d_MaxPooling.value})
+                index += 2
+
+            elif t0 == C and t1 == AP:
+                new_structure.append({"type": LayerType.Conv2d_AvgPooling.value})
                 index += 2
 
             elif t0 == L and t1 == BN:
